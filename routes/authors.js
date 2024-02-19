@@ -3,7 +3,7 @@ const { AuthorController } = require('../Controller');
 const asyncWrapper = require('../lib/asyncWrapper');
 
 router.get('/author', async (req, res, next) => {
-  const [err, authors] = await asyncWrapper(AuthorController.find(req.query));
+  const [err, authors] = await asyncWrapper(AuthorController.getAuthors(req.query));
   res.json(authors);
   if (!err) {
     res.json(authors);
