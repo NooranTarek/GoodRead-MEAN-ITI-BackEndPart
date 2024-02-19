@@ -1,9 +1,9 @@
 const router = require('express').Router();
-const { AuthorController } = require('../Controller');
+const { BookController } = require('../Controller');
 const asyncWrapper = require('../lib/asyncWrapper');
 
-router.get('/author', async (req, res, next) => {
-  const [err, authors] = await asyncWrapper(AuthorController.find(req.query));
+router.get('/book', async (req, res, next) => {
+  const [err, authors] = await asyncWrapper(BookController.getBooks(req.query));
   res.json(authors);
   if (!err) {
     res.json(authors);
@@ -11,24 +11,24 @@ router.get('/author', async (req, res, next) => {
   return next(err);
 });
 
-router.post('/author', async (req, res, next) => {
-  const [err] = await asyncWrapper(AuthorController.create(req.body));
+router.post('/book', async (req, res, next) => {
+  const [err] = await asyncWrapper(BookController.create(req.body));
   if (!err) {
     res.json('created sucessfully');
   }
   return next(err);
 });
 
-router.patch('/author/:id', async (req, res, next) => {
-  const [err] = await asyncWrapper(AuthorController.update(req.params.id, req.body));
+router.patch('/book/:id', async (req, res, next) => {
+  const [err] = await asyncWrapper(BookController.update(req.params.id, req.body));
   if (!err) {
     res.json('updated sucessfully');
   }
   return next(err);
 });
 
-router.delete('/author/:id', async (req, res, next) => {
-  const [err, todo] = await asyncWrapper(AuthorController.deleteAthor(req.params.id));
+router.delete('/book/:id', async (req, res, next) => {
+  const [err, todo] = await asyncWrapper(BookController.deleteBook(req.params.id));
   if (!err) {
     return res.json(todo);
   }
