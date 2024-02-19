@@ -1,8 +1,10 @@
 /* eslint-disable no-underscore-dangle */
+const dotenv = require('dotenv');
 const Book = require('../models/book');
 const Author = require('../models/author');
 const CustomError = require('../lib/appError');
 
+dotenv.config();
 const { paginationNum } = process.env;
 
 // 1-get authors
@@ -10,10 +12,13 @@ const { paginationNum } = process.env;
 const getAuthors = async (query) => { // /author?pageNum=1,popular=(true or false)
   let authros;
   // get authors pagination
+  console.log(paginationNum);
+  console.log(query.pageNum);
   if (!query.popular) {
     authros = await Author.find().limit(paginationNum).skip((query.pageNum - 1) * paginationNum)
       .exec()
       .catch((err) => err);
+    return authros;
   }
   // get popular authors that have the heighest num of books / apply pagination also
   authros = await Book.aggregate([

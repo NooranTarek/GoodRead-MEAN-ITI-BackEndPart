@@ -28,4 +28,7 @@ app.use((err, req, res, next) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
+=======
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
