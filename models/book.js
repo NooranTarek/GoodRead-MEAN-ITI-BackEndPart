@@ -11,7 +11,9 @@ const bookSchema = Schema({
   },
   author: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
   image: { type: String, required: true },
-  category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+  category: {
+    type: Schema.Types.ObjectId, ref: 'Category', required: true, unique: true,
+  },
   valueOfRating: {
     type: Number,
     enum: [1, 2, 3, 4, 5],
@@ -30,7 +32,6 @@ bookSchema.pre('findOneAndUpdate', function foau(next) {
   this.options.runValidators = true;
   next();
 });
-
 const Book = mongoose.model('Book', bookSchema);
 
 module.exports = Book;
