@@ -9,7 +9,7 @@ const { paginationNum } = process.env;
 
 // 1-get authors
 
-const getAuthors = async (query) => { // /author?pageNum=1,popular=(true or false)
+const getAuthors = async (query) => { // author?pageNum=1,popular=(true or false)
   let authros;
   // get authors pagination
   console.log(paginationNum);
