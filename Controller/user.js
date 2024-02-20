@@ -13,7 +13,7 @@ const Users = require('../models/user');
             res.status(201).json({ message: "User registered successfully", newUser });
         }
 }; */
-/*const register = async (req, res) => {
+/* const register = async (req, res) => {
   try {
     const {
       firstName, lastName, email, password, repassword,
@@ -30,7 +30,7 @@ const Users = require('../models/user');
   } catch (error) {
     res.json({ message: 'error', error });
   }
-};*/
+}; */
 
 // module.exports = { register };
 const register = async (userData) => {
@@ -47,11 +47,13 @@ const register = async (userData) => {
     // console.log(hashedPassword);
     const newUser = await Users.create({
       firstName, lastName, email, password: hashedPassword,
+    }).catch((err) => {
+      throw new AppError(err.message, 400);
     });
-    // console.log(newUser);
     return newUser;
   }
 };
+
 /* const register = async (userData) => {
     const { firstName, lastName, email, password, repassword } = userData;
     if (password !== repassword) {
