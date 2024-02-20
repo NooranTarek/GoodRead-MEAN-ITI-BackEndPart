@@ -22,6 +22,15 @@ app.use(routes);
 app.use((err, req, res, next) => {
   console.log(err);
   res.status(err.status).json({ error: err.message });
+/*=======
+  // Check if the error is an instance of AppError
+  if (err instanceof AppError) {
+    res.status(err.status).json({ error: err.message });
+  } else {
+    // return a generic error response
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+*/
 });
 
 app.listen(PORT, () => {
