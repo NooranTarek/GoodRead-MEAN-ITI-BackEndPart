@@ -23,12 +23,11 @@ app.use((err, req, res, next) => {
   if (err instanceof AppError) {
     res.status(err.status).json({ error: err.message });
   } else {
-    //return a generic error response
+    // return a generic error response
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-=======
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
