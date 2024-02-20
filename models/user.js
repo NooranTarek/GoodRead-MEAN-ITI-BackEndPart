@@ -1,27 +1,27 @@
 /* eslint-disable no-underscore-dangle */
 const mongoose = require('mongoose');
+
 const usersSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
       required: true,
-      /*validate: {
+      /* validate: {
         validator(value) {
           return /^[a-zA-Z0-9_-]{3,16}$/.test(value);
         },
         message: (props) => `${props.value} is not a valid username!`,
-      },
-    },*/
-  },
+      }, */
+    },
     lastName: {
       type: String,
       required: true,
-      /*validate: {
+      /* validate: {
         validator(value) {
           return /^[a-zA-Z0-9_-]{3,16}$/.test(value);
         },
         message: (props) => `${props.value} is not a valid username!`,
-      },*/
+      }, */
     },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -30,12 +30,12 @@ const usersSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    /*toJSON: {
+    /* toJSON: {
       transform: (doc, ret) => {
         delete ret.password; // Remove password field from JSON
         return ret;
       },
-    },*/
+    }, */
   },
 );
 
