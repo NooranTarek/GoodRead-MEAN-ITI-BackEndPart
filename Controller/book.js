@@ -11,21 +11,23 @@ const { paginationNum } = process.env || 30;
 // 1-get books
 
 const getBooks = async (query) => { // /author?pageNum=1,popular=(true or false)
-  let authros;
+  let books;
   // get authors pagination
   if (!query.popular) {
-    authros = await Book.find().limit(paginationNum).skip((query.pageNum - 1) * paginationNum)
+    books = await Book.find().limit(paginationNum).skip((query.pageNum - 1) * paginationNum)
       .exec()
       .catch((err) => err);
+    return books;
   }
-  return authros;
+
+  return books;
 };
 
 // 2-create author
 
 const create = async (data) => {
   // eslint-disable-next-line no-param-reassign
-  await Author.create(data)
+  await Book.create(data)
     .exec()
     .catch((err) => {
       throw new CustomError(err.message, 422);
@@ -35,7 +37,7 @@ const create = async (data) => {
 // 3-update author
 
 const update = async (id, data) => {
-  await Author.findOneAndUpdate({ _id: id }, data)
+  await Book.findOneAndUpdate({ _id: id }, data)
     .exec()
     .catch((err) => {
       throw new CustomError(err.message, 422);
@@ -45,7 +47,7 @@ const update = async (id, data) => {
 // 4-delete author
 
 const deleteBook = async (id) => {
-  await Author.deleteOne({ _id: id })
+  await Book.deleteOne({ _id: id })
     .exec()
     .catch((err) => {
       throw new CustomError(err.message, 422);
