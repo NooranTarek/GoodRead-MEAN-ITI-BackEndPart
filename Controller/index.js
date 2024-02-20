@@ -2,6 +2,6 @@
 module.exports = {
   AuthorController: require('./author'),
   BookController: require('./book'),
-  UserController:require('./user'),
-  CategoryController :require('./categories')
+  UserController: require('./user'),
+  CategoryController: require('./categories'),
 };
