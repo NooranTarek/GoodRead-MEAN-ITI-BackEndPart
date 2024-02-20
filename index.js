@@ -13,22 +13,17 @@ mongoose.connect('mongodb+srv://nourantareqmohamed:HHvw8soG2oa2mok7@nouransclust
 const PORT = process.env.PORT || 3000;
 
 const dotenv = require('dotenv');
+// const AppError = require('./lib/appError');
 
 dotenv.config();
 app.use(express.json());
 app.use(routes);
 
 app.use((err, req, res, next) => {
-  // Check if the error is an instance of AppError
-  if (err instanceof AppError) {
-    res.status(err.status).json({ error: err.message });
-  } else {
-    //return a generic error response
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+  console.log(err);
+  res.status(err.status).json({ error: err.message });
 });
 
-=======
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
