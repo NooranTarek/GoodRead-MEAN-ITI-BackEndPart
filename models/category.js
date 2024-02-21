@@ -21,6 +21,14 @@ const categorySchema = new Schema({
   this.options.runValidators = true;
   next();
 }); */
+
+/* categorySchema.plugin(autoIncrement.plugin, {
+  model: 'Category',
+  field: 'id',
+  startAt: 1,
+  incrementBy: 1,
+}); */
+
 const Category = mongoose.model('Category', categorySchema);
 
 module.exports = Category;
