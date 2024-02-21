@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 
 const usersSchema = new mongoose.Schema(
   {
+    id: {
+      type: Number,
+      unique: true,
+    },
     username: {
       type: String,
       required: true,
@@ -50,6 +54,14 @@ const usersSchema = new mongoose.Schema(
   },
 );
 
+usersSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    const users = await this.constructor.find().sort({ id: -1 });
+    if (users.length === 0) this.id = 1;
+    else this.id = users[0].id + 1;
+  }
+  next();
+});
 const Users = mongoose.model('Users', usersSchema);
 
 module.exports = Users;
