@@ -37,7 +37,24 @@ const getAuthors = async (query) => { // author?pageNum=1,popular=(true or false
     });
   return authros;
 };
-
+const getPopularAuthors = async () => {
+  // get popular authors that have the heighest num of books / apply pagination also
+  const authros = await Book.aggregate([
+    {
+      $group: {
+        _id: '$author',
+        totalBooks: { $sum: 1 },
+      },
+    },
+    { $sort: { $totalBooks: -1 } },
+    // { $skip: (query.pageNum - 1) * paginationNum },
+    { $limit: paginationNum },
+  ])
+    .catch((err) => {
+      throw new AppError(err.message, 400);
+    });
+  return authros;
+};
 // 2-create author
 
 const create = async (data) => {
@@ -73,4 +90,5 @@ module.exports = {
   create,
   update,
   deleteAthor,
+  getPopularAuthors,
 };
