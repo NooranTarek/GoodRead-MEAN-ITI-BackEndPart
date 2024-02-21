@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./routes');
+const AppError = require('./lib/appError');
 
 const app = express();
 
@@ -22,7 +23,6 @@ app.use(routes);
 app.use((err, req, res, next) => {
   // console.log(err);
   res.status(err.status).json({ error: err.message });
-/*= ======
   // Check if the error is an instance of AppError
   if (err instanceof AppError) {
     res.status(err.status).json({ error: err.message });
@@ -30,7 +30,6 @@ app.use((err, req, res, next) => {
     // return a generic error response
     res.status(500).json({ error: 'Internal Server Error' });
   }
-*/
 });
 
 app.listen(PORT, () => {

@@ -19,7 +19,13 @@ const getBooks = async (query) => { // /author?pageNum=1,popular=(true or false)
       .catch((err) => err);
     return books;
   }
-
+  books = await Book.find()
+    .sort({ countOfRating: -1 })
+    .limit(paginationNum)
+    // .skip((query.pageNum - 1) * paginationNum)
+    .populate('author')
+    .populate('category')
+    .populate('reviews');
   return books;
 };
 
@@ -27,31 +33,31 @@ const getBooks = async (query) => { // /author?pageNum=1,popular=(true or false)
 
 const create = async (data) => {
   // eslint-disable-next-line no-param-reassign
-  await Book.create(data)
-    .exec()
+  const book = await Book.create(data)
     .catch((err) => {
       throw new CustomError(err.message, 422);
     });
+  return book;
 };
 
 // 3-update author
 
 const update = async (id, data) => {
-  await Book.findOneAndUpdate({ _id: id }, data)
-    .exec()
+  const book = await Book.findOneAndUpdate({ _id: id }, data)
     .catch((err) => {
       throw new CustomError(err.message, 422);
     });
+  return book;
 };
 
 // 4-delete author
 
 const deleteBook = async (id) => {
-  await Book.deleteOne({ _id: id })
-    .exec()
+  const book = await Book.findOneAndDelete({ _id: id })
     .catch((err) => {
       throw new CustomError(err.message, 422);
     });
+  return book;
 };
 module.exports = {
   getBooks,
