@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const categorySchema = new Schema({
+  id: {
+    type: Number,
+    unique: true,
+  },
   name: {
     type: String,
     required: true,
@@ -17,18 +21,14 @@ const categorySchema = new Schema({
     unique: true,
   },
 });
-/* categorySchema.pre('findOneAndUpdate', function foau(next) {
-  this.options.runValidators = true;
-  next();
-}); */
-
-/* categorySchema.plugin(autoIncrement.plugin, {
-  model: 'Category',
-  field: 'id',
-  startAt: 1,
-  incrementBy: 1,
-}); */
 
 const Category = mongoose.model('Category', categorySchema);
+categorySchema.pre('save', async function (next) {
+  if (this.isNew) {
+    const maxId = await Category.find().sort({ id: -1 }).limit(1);
+    this.maxId = maxId[0].id + 1;
+  }
+  next();
+});
 
 module.exports = Category;
