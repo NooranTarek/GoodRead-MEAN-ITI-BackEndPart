@@ -27,7 +27,16 @@ const getBooks = async (query) => { // /book?pageNum=1,popular=(true or false)
     .populate('reviews');
   return books;
 };
-
+const getPopularBooks = async () => { // /book?pageNum=1,popular=(true or false)
+  const books = await Book.find()
+    .sort({ countOfRating: -1 })
+    .limit(paginationNum)
+    // .skip((query.pageNum - 1) * paginationNum)
+    .populate('book')
+    .populate('category')
+    .populate('reviews');
+  return books;
+};
 // 2-create book
 
 const create = async (data) => {
@@ -63,4 +72,5 @@ module.exports = {
   create,
   update,
   deleteBook,
+  getPopularBooks,
 };
