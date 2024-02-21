@@ -2,6 +2,7 @@ const JWT = require('jsonwebtoken');
 const AppError = require('../lib/appError');
 const { hashFunction, compareFunction } = require('../lib/hashAndCompare');
 const Users = require('../models/user');
+const Category = require('../models/category');
 
 const addAdmin = async (userData) => {
   const {
@@ -36,4 +37,13 @@ const login = async (userData) => {
     }
   }
 };
-module.exports = { addAdmin, login };
+
+const addCategory = async (userData) => {
+  const { name } = userData;
+  const newCategory = await Category.create({ name }).catch((err) => {
+    throw new AppError(err.message, 400);
+  });
+  return newCategory;
+};
+
+module.exports = { addAdmin, login, addCategory };
