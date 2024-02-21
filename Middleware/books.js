@@ -1,18 +1,17 @@
-const router = require('express').Router();
 const { BookController } = require('../Controller');
 const asyncWrapper = require('../lib/asyncWrapper');
 const AppError = require('../lib/appError');
 
-router.get('/', async (req, res, next) => {
+const getBooks = async (req, res, next) => {
   const [err, authors] = await asyncWrapper(BookController.getBooks(req.query));
   res.json(authors);
   if (!err) {
     res.json(authors);
   }
   return next(err);
-});
+};
 
-router.post('/', async (req, res, next) => {
+const createBook = async (req, res, next) => {
   const [err, data] = await asyncWrapper(BookController.create(req.body));
   if (err) {
     return next(err);
@@ -22,9 +21,9 @@ router.post('/', async (req, res, next) => {
   }
   const responseData = { ...data.toObject(), message: 'Created successfully' };
   res.json(responseData);
-});
+};
 
-router.patch('/:id', async (req, res, next) => {
+const updateBook = async (req, res, next) => {
   const [err, data] = await asyncWrapper(BookController.update(req.params.id, req.body));
   if (err) {
     return next(err);
@@ -34,9 +33,9 @@ router.patch('/:id', async (req, res, next) => {
   }
   const responseData = { ...data.toObject(), message: 'Updated successfully' };
   res.json(responseData);
-});
+};
 
-router.delete('/:id', async (req, res, next) => {
+const deleteBook = async (req, res, next) => {
   const [err, data] = await asyncWrapper(BookController.deleteBook(req.params.id));
   if (err) {
     return next(err);
@@ -46,5 +45,11 @@ router.delete('/:id', async (req, res, next) => {
   }
   const responseData = { ...data.toObject(), message: 'Delete successfully' };
   res.json(responseData);
-});
-module.exports = router;
+};
+
+module.exports = {
+  getBooks,
+  createBook,
+  updateBook,
+  deleteBook,
+};

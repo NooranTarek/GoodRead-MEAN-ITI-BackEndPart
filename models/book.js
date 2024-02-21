@@ -12,7 +12,7 @@ const bookSchema = Schema({
   author: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
   image: { type: String, required: true },
   category: {
-    type: Schema.Types.ObjectId, ref: 'Category', required: true, unique: true,
+    type: Schema.Types.ObjectId, ref: 'Category', required: true,
   },
   valueOfRating: {
     type: Number,
