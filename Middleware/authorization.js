@@ -1,11 +1,12 @@
 const AppError = require('../lib/appError');
 
-const allowedTo = (...roles) => (async (req, res, next) => {
+const allowedTo = (...roles) => (req, res, next) => {
+  // console.log(req.user.role);
   if (!roles.includes(req.user.role)) {
-    res.status(403).json(`you are not authorized you are ==> ${req.user.role}`); // throw new AppError(`you are not authorized you are ==> ${req.user.role}`, 403);
+    throw new AppError(`you are not authorized you are ==> ${req.user.role}`, 403);
   } else {
     next();
   }
-});
+};
 
 module.exports = allowedTo;
