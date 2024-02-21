@@ -3,17 +3,16 @@ const AppError = require('../lib/appError');
 const { hashFunction, compareFunction } = require('../lib/hashAndCompare');
 const Users = require('../models/user');
 
-// module.exports = { register };
-const register = async (userData) => {
+const addAdmin = async (userData) => {
   const {
-    firstName, lastName, email, password, repassword, username,
+    firstName, lastName, email, password, repassword, username, role,
   } = userData;
   if (password !== repassword) {
     throw new AppError("Passwords don't match .. try to fill them again", 400);
   } else {
     const hashedPassword = await hashFunction({ plainText: password });
     const newUser = await Users.create({
-      firstName, lastName, email, password: hashedPassword, username,
+      firstName, lastName, email, password: hashedPassword, username, role,
     }).catch((err) => {
       throw new AppError(err.message, 400);
     });
@@ -37,4 +36,4 @@ const login = async (userData) => {
     }
   }
 };
-module.exports = { register, login };
+module.exports = { addAdmin, login };

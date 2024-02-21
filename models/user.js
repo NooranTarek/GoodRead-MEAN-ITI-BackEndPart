@@ -3,6 +3,17 @@ const mongoose = require('mongoose');
 
 const usersSchema = new mongoose.Schema(
   {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator(value) {
+          return /^[a-zA-Z0-9_-]{3,16}$/.test(value);
+        },
+        message: (props) => `${props.value} is not a valid username!`,
+      },
+    },
     firstName: {
       type: String,
       required: true,
@@ -10,7 +21,7 @@ const usersSchema = new mongoose.Schema(
         validator(value) {
           return /^[a-zA-Z0-9_-]{3,16}$/.test(value);
         },
-        message: (props) => `${props.value} is not a valid username!`,
+        message: (props) => `${props.value} is not a valid first name!`,
       },
     },
     lastName: {
@@ -20,7 +31,7 @@ const usersSchema = new mongoose.Schema(
         validator(value) {
           return /^[a-zA-Z0-9_-]{3,16}$/.test(value);
         },
-        message: (props) => `${props.value} is not a valid username!`,
+        message: (props) => `${props.value} is not a valid last name!`,
       },
     },
     email: { type: String, required: true, unique: true },
