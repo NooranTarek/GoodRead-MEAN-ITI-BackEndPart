@@ -1,12 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 const Book = require('../models/book');
-const book = require('../models/book');
 const User = require('../models/user');
 const Review = require('../models/review');
 const Category = require('../models/category');
 const CustomError = require('../lib/appError');
 
-const { paginationNum } = process.env || 30;
+const { paginationNum } = process.env;
 
 // 1-get books
 

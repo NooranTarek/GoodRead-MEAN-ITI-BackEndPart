@@ -2,10 +2,10 @@ const router = require('express').Router();
 const { BookController } = require('../Controller');
 const asyncWrapper = require('../lib/asyncWrapper');
 const AppError = require('../lib/appError');
+const { isAuth } = require('../Middleware/authentication');
 
 router.get('/', async (req, res, next) => {
   const [err, authors] = await asyncWrapper(BookController.getBooks(req.query));
-  res.json(authors);
   if (!err) {
     res.json(authors);
   }
@@ -24,7 +24,7 @@ router.post('/', async (req, res, next) => {
   res.json(responseData);
 });
 
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', isAuth, async (req, res, next) => {
   const [err, data] = await asyncWrapper(BookController.update(req.params.id, req.body));
   if (err) {
     return next(err);
