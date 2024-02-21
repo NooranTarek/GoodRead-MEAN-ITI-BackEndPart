@@ -8,4 +8,4 @@ const allowedTo = (...roles) => (async (req, res, next) => {
   }
 });
 
-module.export = {allowedTo}
+module.export = { allowedTo };

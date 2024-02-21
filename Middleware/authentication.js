@@ -1,21 +1,19 @@
 const jwt = require('jsonwebtoken');
 const AppError = require('../lib/appError');
 
-const secretKey = process.env.JWT_KEY;
-
-const authenticatedUser = (req, res, next) => {
+const isAuth = (req, res, next) => {
   try {
-    const token = req.get('authorization');
-    const verified = jwt.verify(token, secretKey); // if true return payload
+    const token = req.header('token');
+    const verified = jwt.verify(token, process.env.JWT_KEY); // if true return payload
     if (verified) {
-      req.user = verified.id;
+      req.user = verified.userExist;
       return next();
     }
-    throw new AppError('UNAUTHENTICATED', 403);
   } catch (error) {
-    throw new AppError('UNAUTHENTICATED', 403);
+    throw new AppError('Your are not authenticated please login', 403);
   }
 };
+
 module.exports = {
-  authenticatedUser,
+  isAuth,
 };
