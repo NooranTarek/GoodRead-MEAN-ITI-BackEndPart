@@ -22,4 +22,14 @@ router.post('/login', async (req, res, next) => {
   // eslint-disable-next-line consistent-return
   return next(new AppError(err.message, 400));
 });
+
+router.post('/addCategory', async (req, res, next) => {
+  const [err, data] = await asyncWrapper(AdminController.addCategory(req.body));
+  if (!err) {
+    res.json({ message: 'Category addedd successfully', data });
+    return;
+  }
+  // eslint-disable-next-line consistent-return
+  return next(new AppError(err.message, 400));
+});
 module.exports = router;
