@@ -2,22 +2,22 @@
 const dotenv = require('dotenv');
 const Book = require('../models/book');
 const Author = require('../models/author');
-const CustomError = require('../lib/appError');
+const AppError = require('../lib/appError');
 
 dotenv.config();
-const { paginationNum } = process.env;
+const { paginationNum } = process.env || 100;
 
 // 1-get authors
 
 const getAuthors = async (query) => { // author?pageNum=1,popular=(true or false)
   let authros;
-  // get authors pagination
-  console.log(paginationNum);
-  console.log(query.pageNum);
+
+  // get all authors pagination
   if (!query.popular) {
     authros = await Author.find().limit(paginationNum).skip((query.pageNum - 1) * paginationNum)
-      .exec()
-      .catch((err) => err);
+      .catch((err) => {
+        throw new AppError(err.message, 400);
+      });
     return authros;
   }
   // get popular authors that have the heighest num of books / apply pagination also
@@ -29,11 +29,12 @@ const getAuthors = async (query) => { // author?pageNum=1,popular=(true or false
       },
     },
     { $sort: { $totalBooks: -1 } },
-    { $skip: (query.pageNum - 1) * paginationNum },
-    { $limit: query.pageNum },
+    // { $skip: (query.pageNum - 1) * paginationNum },
+    { $limit: paginationNum },
   ])
-    .exec()
-    .catch((err) => err);
+    .catch((err) => {
+      throw new AppError(err.message, 400);
+    });
   return authros;
 };
 
@@ -41,31 +42,31 @@ const getAuthors = async (query) => { // author?pageNum=1,popular=(true or false
 
 const create = async (data) => {
   // eslint-disable-next-line no-param-reassign
-  await Author.create(data)
-    .exec()
+  const author = await Author.create(data)
     .catch((err) => {
-      throw new CustomError(err.message, 422);
+      throw new AppError(err.message, 400);
     });
+  return author;
 };
 
 // 3-update author
 
 const update = async (id, data) => {
-  await Author.findOneAndUpdate({ _id: id }, data)
-    .exec()
+  const author = await Author.findOneAndUpdate({ _id: id }, data)
     .catch((err) => {
-      throw new CustomError(err.message, 422);
+      throw new AppError(err.message, 422);
     });
+  return author;
 };
 
 // 4-delete author
 
 const deleteAthor = async (id) => {
-  await Author.deleteOne({ _id: id })
-    .exec()
+  const author = await Author.findOneAndDelete({ _id: id })
     .catch((err) => {
-      throw new CustomError(err.message, 422);
+      throw new AppError(err.message, 422);
     });
+  return author;
 };
 module.exports = {
   getAuthors,
