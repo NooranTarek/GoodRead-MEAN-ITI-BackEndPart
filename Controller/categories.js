@@ -59,8 +59,6 @@ const getAllCategories = async (pageNum, pageSize) => {
   return categories;
 };
 
-
-
 module.exports = {
   addCategory, updateCategory, deleteCategory, getPopularCategories, getAllCategories,
 };

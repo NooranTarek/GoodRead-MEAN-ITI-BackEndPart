@@ -22,13 +22,15 @@ const categorySchema = new Schema({
   },
 });
 
-const Category = mongoose.model('Category', categorySchema);
 categorySchema.pre('save', async function (next) {
   if (this.isNew) {
-    const maxId = await Category.find().sort({ id: -1 }).limit(1);
-    this.maxId = maxId[0].id + 1;
+    const categories = await this.constructor.find().sort({ id: -1 });
+    if (categories.length === 0) this.id = 1;
+    else this.id = categories[0].id + 1;
   }
   next();
 });
+
+const Category = mongoose.model('Category', categorySchema);
 
 module.exports = Category;
