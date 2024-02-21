@@ -23,7 +23,44 @@ const deleteCategory = async (id) => {
   });
   return newCategory;
 };
+const getPopularCategories = async () => {
+  const popularCategories = await Category.aggregate([
+    {
+      $lookup: {
+        from: 'books',
+        localField: '_id',
+        foreignField: 'category',
+        as: 'booksInCategory',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        bookCount: { $size: '$booksInCategory' },
+      },
+    },
+    { $sort: { bookCount: -1 } },
+    { $limit: 10 },
+  ]).catch((err) => {
+    throw new AppError(err.message, 500);
+  });
+  return popularCategories;
+};
+
+const getAllCategories = async (pageNum, pageSize) => {
+  const categories = await Category.find()
+    .limit(pageSize)
+    .skip((pageNum - 1) * pageSize)
+    .exec()
+    .catch((err) => {
+      throw new AppError(err.message, 500);
+    });
+  return categories;
+};
+
+
 
 module.exports = {
-  addCategory, updateCategory, deleteCategory,
+  addCategory, updateCategory, deleteCategory, getPopularCategories, getAllCategories,
 };
