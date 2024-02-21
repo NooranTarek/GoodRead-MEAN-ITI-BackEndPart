@@ -38,12 +38,6 @@ const login = async (userData) => {
   }
 };
 
-const addCategory = async (userData) => {
-  const { name } = userData;
-  const newCategory = await Category.create({ name }).catch((err) => {
-    throw new AppError(err.message, 400);
-  });
-  return newCategory;
+module.exports = {
+  addAdmin, login,
 };
-
-module.exports = { addAdmin, login, addCategory };
