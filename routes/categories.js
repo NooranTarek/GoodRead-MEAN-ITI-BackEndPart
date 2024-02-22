@@ -39,20 +39,29 @@ router.delete('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
 
 router.get('/popularCategories', async (req, res, next) => {
   const [err, popularCategories] = await asyncWrapper(CategoryController.getPopularCategories());
-  if (!err) {
-    res.json({ popularCategories });
-  }
-  return next(new AppError(err.message, 400));
+  if (err) next(new AppError(err.message, 400));
+  res.json({ popularCategories });
 });
 
 router.get('/', async (req, res, next) => {
   const pageNum = req.query.pageNum ? (req.query.pageNum) : 1;
   const pageSize = 10; // Adjust as needed
   const [err, categories] = await asyncWrapper(CategoryController.getAllCategories(pageNum, pageSize));
-  if (!err) {
-    res.json({ categories });
-  }
-  next(new AppError(err.message, 400));
+  if (err) next(new AppError(err.message, 400));
+  res.json({ categories });
 });
 
+router.get('/categoriesName', async (req, res, next) => {
+  const [err, categories] = await asyncWrapper(CategoryController.categoriesName());
+  if (err) next(new AppError(err.message, 400));
+  res.json({ categories });
+});
+
+router.get('/:id', async (req, res, next) => {
+  const [err, categories] = await asyncWrapper(CategoryController.booksForSpecificCategory(req.params.id));
+  if (err) next(new AppError(err.message, 400));
+  else {
+    res.json({ categories });
+  }
+});
 module.exports = router;

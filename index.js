@@ -1,10 +1,18 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
 const routes = require('./routes');
 const AppError = require('./lib/appError');
 
 const app = express();
 
+const corsOptions = {
+  origin: 'http://localhost:4200',
+};
+
+app.use(cors(corsOptions));
 mongoose.connect('mongodb+srv://nourantareqmohamed:HHvw8soG2oa2mok7@nouranscluster0.4zfzjbg.mongodb.net/goodReads').then(() => {
   console.error('Connecting sucessfully');
 }).catch((error) => {
@@ -13,7 +21,6 @@ mongoose.connect('mongodb+srv://nourantareqmohamed:HHvw8soG2oa2mok7@nouransclust
 
 const PORT = process.env.PORT || 3000;
 
-const dotenv = require('dotenv');
 // const AppError = require('./lib/appError');
 
 dotenv.config();
