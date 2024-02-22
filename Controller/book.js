@@ -1,9 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-const Book = require("../models/book");
-const User = require("../models/user");
-const Review = require("../models/review");
-const Category = require("../models/category");
-const AppError = require("../lib/appError");
+const Book = require('../models/book');
+const Review = require('../models/review');
+const AppError = require('../lib/appError');
 
 const { paginationNum } = process.env;
 
@@ -11,46 +9,69 @@ const { paginationNum } = process.env;
 
 const getBooks = async (query) => {
   // /book?pageNum=1&popular=(true or false)
-  let books;
   // get books pagination
-  if (!query.popular) {
-    books = await Book.find()
-      .limit(paginationNum)
-      .skip((query.pageNum - 1) * paginationNum)
-      .exec()
-      .catch((err) => err);
-    return books;
-  }
-  books = await Book.find()
-    .sort({ countOfRating: -1 })
+  const books = await Book.find()
     .limit(paginationNum)
-    // .skip((query.pageNum - 1) * paginationNum)
-    .populate("book")
-    .populate("category")
-    .populate("reviews");
+    .skip((query.pageNum - 1) * paginationNum)
+    .populate('category')
+    .populate('author')
+    .populate('reviews')
+    .catch((err) => {
+      throw new AppError(err.message, 422);
+    });
+  console.log(books);
   return books;
 };
 
 // get popular book
 const getPopularBooks = async () => {
-  // /book?pageNum=1,popular=(true or false)
   const books = await Book.find()
     .sort({ countOfRating: -1 })
     .limit(paginationNum)
-    // .skip((query.pageNum - 1) * paginationNum)
-    .populate("book")
-    .populate("category")
-    .populate("reviews");
+    .populate('category')
+    .populate('author')
+    .populate('reviews')
+    .catch((err) => {
+      throw new AppError(err.message, 422);
+    });
   return books;
 };
 
 // eslint-disable-next-line max-len
 // get specific book filter by shelve value sended in query params book/shelve?pageNum=1&shelve=want%20to%20read
-const getBooksFilterByShelve = async (query) => {
-  const books = await Book.find({ shelve: query.shelve })
-    .limit(paginationNum)
-    .populate("author")
-    .skip((query.pageNum - 1) * paginationNum);
+const getBooksFilterByShelve = async function (query) {
+  const pageNum = query.pageNum || 1;
+  const shelve = query.shelve || '';
+  const pagination = Number(paginationNum) || 100;
+  const books = await Book.aggregate([
+    { $match: { shelve } },
+    { $limit: pagination },
+    {
+      $lookup: {
+        from: 'authors',
+        localField: 'author',
+        foreignField: '_id',
+        as: 'author',
+      },
+    },
+    { $unwind: '$author' },
+    {
+      $project: {
+        id: 1,
+        title: 1,
+        image: 1,
+        valueOfRating: 1,
+        countOfRating: 1,
+        shelve: 1,
+        author: {
+          fullName: { $concat: ['$author.firstName', ' ', '$author.lastName'] },
+        },
+      },
+    },
+    { $skip: (pageNum - 1) * paginationNum },
+  ]).catch((err) => {
+    throw new AppError(err.message, 422);
+  });
   return books;
 };
 
