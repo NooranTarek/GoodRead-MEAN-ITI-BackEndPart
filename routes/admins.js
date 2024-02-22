@@ -5,10 +5,10 @@ const AppError = require('../lib/appError');
 const { isAuth } = require('../Middleware/authentication');
 const allowedTo = require('../Middleware/authorization');
 
-router.post('/addAdmin', isAuth, allowedTo('admin'), async (req, res, next) => {
+router.post('/', isAuth, allowedTo('admin'), async (req, res, next) => {
   const [err, data] = await asyncWrapper(AdminController.addAdmin(req.body));
   if (!err) {
-    res.json({ message: 'User created successfully', data });
+    res.json({ message: 'Admin created successfully', data });
     return;
   }
   // eslint-disable-next-line consistent-return
@@ -18,7 +18,7 @@ router.post('/addAdmin', isAuth, allowedTo('admin'), async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
   const [err, data] = await asyncWrapper(AdminController.login(req.body));
   if (!err) {
-    res.json({ message: 'User logged in successfully', data });
+    res.json({ message: 'Admin logged in successfully', data });
     return;
   }
   // eslint-disable-next-line consistent-return
