@@ -54,11 +54,20 @@ const getAllCategories = async (pageNum, pageSize) => {
     .skip((pageNum - 1) * pageSize)
     .exec()
     .catch((err) => {
+      // console.log(err);
       throw new AppError(err.message, 500);
     });
+  // console.log(categories, 'from controller');
   return categories;
 };
 
+// GetAllCategoriesByName ==> get
+// GetAllForEachCateogry(Book Nme , Author name)
+// getSpecificAuthorById
 module.exports = {
-  addCategory, updateCategory, deleteCategory, getPopularCategories, getAllCategories,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+  getPopularCategories,
+  getAllCategories,
 };
