@@ -19,10 +19,8 @@ const getBooks = async (query) => {
     .catch((err) => {
       throw new AppError(err.message, 422);
     });
-  console.log(books);
   return books;
 };
-
 // get popular book
 const getPopularBooks = async () => {
   const books = await Book.find()
