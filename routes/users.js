@@ -3,7 +3,7 @@ const { UserController } = require('../Controller');
 const asyncWrapper = require('../lib/asyncWrapper');
 const AppError = require('../lib/appError');
 
-router.post('/register', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   const [err, data] = await asyncWrapper(UserController.register(req.body));
   if (!err) {
     res.json({ message: 'User created successfully', data });
