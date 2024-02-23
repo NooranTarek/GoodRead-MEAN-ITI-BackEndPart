@@ -12,7 +12,7 @@ const addCategory = async (userData) => {
 
 const updateCategory = async (userData, id) => {
   const { name } = userData;
-  const updatedCategory = await Category.findByIdAndUpdate({ _id: id }, { name}).catch((err) => {
+  const updatedCategory = await Category.findByIdAndUpdate({ _id: id }, { name }).catch((err) => {
     throw new AppError(err.message, 400);
   });
   return updatedCategory;
