@@ -3,8 +3,8 @@ const Book = require('../models/book');
 const Category = require('../models/category');
 
 const addCategory = async (userData) => {
-  const { name } = userData;
-  const newCategory = await Category.create({ name }).catch((err) => {
+  const { name, image } = userData;
+  const newCategory = await Category.create({ name, image }).catch((err) => {
     throw new AppError(err.message, 400);
   });
   return newCategory;
@@ -12,7 +12,7 @@ const addCategory = async (userData) => {
 
 const updateCategory = async (userData, id) => {
   const { name } = userData;
-  const updatedCategory = await Category.findByIdAndUpdate({ _id: id }, { name }).catch((err) => {
+  const updatedCategory = await Category.findByIdAndUpdate({ _id: id }, { name}).catch((err) => {
     throw new AppError(err.message, 400);
   });
   return updatedCategory;
@@ -63,7 +63,7 @@ const getAllCategories = async (pageNum, pageSize) => {
 };
 
 const categoriesName = async () => {
-  const categories = await Category.find().select('-_id name').catch((err) => {
+  const categories = await Category.find().select('-_id name image id').catch((err) => {
     throw new AppError(err.message, 500);
   });
   return categories;
