@@ -88,7 +88,30 @@ router.patch(
     return res.json(responseData);
   },
 );
-
+router.patch(
+  '/:id/rating', // Path without the base URL
+  isAuth,
+  allowedTo('admin', 'user'),
+  async (req, res, next) => {
+    const [err, data] = await asyncWrapper(
+      BookController.updateRating(req.params.id, req.query.rate),
+    );
+    if (!data) {
+      return next(new AppError('Book not found', 404));
+    }
+    if (err) {
+      return next(err);
+    }
+    if (!data) {
+      return next(new AppError('not updated successfully', 422));
+    }
+    const responseData = {
+      ...data.toObject(),
+      message: 'Updated successfully',
+    };
+    return res.json(responseData);
+  },
+);
 router.delete('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     BookController.deleteBook(req.params.id),
