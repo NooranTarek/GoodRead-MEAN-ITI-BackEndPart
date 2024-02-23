@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
@@ -7,7 +7,7 @@ const categorySchema = new Schema({
     type: Number,
     unique: true,
   },
-  image: { type: String, required: true },
+  image: { type: String },
   name: {
     type: String,
     required: true,
@@ -23,7 +23,7 @@ const categorySchema = new Schema({
   },
 });
 
-categorySchema.pre('save', async function (next) {
+categorySchema.pre("save", async function (next) {
   if (this.isNew) {
     const categories = await this.constructor.find().sort({ id: -1 });
     if (categories.length === 0) this.id = 1;
@@ -32,6 +32,6 @@ categorySchema.pre('save', async function (next) {
   next();
 });
 
-const Category = mongoose.model('Category', categorySchema);
+const Category = mongoose.model("Category", categorySchema);
 
 module.exports = Category;
