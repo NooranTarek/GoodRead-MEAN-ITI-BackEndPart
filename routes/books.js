@@ -83,10 +83,8 @@ router.post(
   '/',
   isAuth,
   allowedTo('admin'),
-  upload.single('image'),
   async (req, res, next) => {
-    const imageOriginalName = req.file.originalname;
-    req.body.image = imageOriginalName;
+    req.body.image = 'https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
     const [err, data] = await asyncWrapper(BookController.create(req.body));
 
     if (err) {

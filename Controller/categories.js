@@ -12,14 +12,14 @@ const addCategory = async (userData) => {
 
 const updateCategory = async (userData, id) => {
   const { name } = userData;
-  const updatedCategory = await Category.findByIdAndUpdate({ _id: id }, { name }).catch((err) => {
+  const updatedCategory = await Category.findOneAndUpdate({ id }, { name }).catch((err) => {
     throw new AppError(err.message, 400);
   });
   return updatedCategory;
 };
 
 const deleteCategory = async (id) => {
-  const newCategory = await Category.findByIdAndDelete({ _id: id }).catch((err) => {
+  const newCategory = await Category.findOneAndUpdate({ id }).catch((err) => {
     throw new AppError(err.message, 400);
   });
   return newCategory;
