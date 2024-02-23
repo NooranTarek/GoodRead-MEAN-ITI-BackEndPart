@@ -19,7 +19,7 @@ const updateCategory = async (userData, id) => {
 };
 
 const deleteCategory = async (id) => {
-  const newCategory = await Category.findOneAndUpdate({ id }).catch((err) => {
+  const newCategory = await Category.findOneAndDelete({ id }).catch((err) => {
     throw new AppError(err.message, 400);
   });
   return newCategory;
