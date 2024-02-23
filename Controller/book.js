@@ -8,8 +8,9 @@ const { paginationNum } = process.env;
 // 1-get books
 
 const getBooks = async (query) => {
-  // /book?pageNum=1&popular=(true or false)
+  // /book?pageNum=1
   // get books pagination
+  console.log(query.pageNum);
   const books = await Book.find()
     .limit(paginationNum)
     .skip((query.pageNum - 1) * paginationNum)
