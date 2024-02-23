@@ -75,9 +75,10 @@ const getBooksFilterByShelve = async function (query) {
 
 // get book by id
 const getBookById = async (id) => {
-  const book = await Book.findOne({ _id: id }).catch((err) => {
-    throw new AppError(err.message, 422);
-  });
+  const book = await Book.findOne({ id }).populate('author').populate('category')
+    .catch((err) => {
+      throw new AppError(err.message, 422);
+    });
   return book;
 };
 
@@ -94,12 +95,29 @@ const create = async (data) => {
 // 3-update book
 
 const update = async (id, data) => {
-  const book = await Book.findOneAndUpdate({ _id: id }, data).catch((err) => {
+  const book = await Book.findOneAndUpdate({ id }, data).catch((err) => {
     throw new AppError(err.message, 422);
   });
   return book;
 };
 
+// update rating
+
+const updateRating = async (id, newRating) => {
+  const book = await Book.findOneAndUpdate(
+    { id },
+    {
+      $inc: { countOfRating: 1, totalRating: newRating },
+    },
+    { new: true },
+  ).catch((err) => {
+    throw new AppError(err.message, 422);
+  });
+  if (!book) {
+    throw new AppError('Book not found', 404);
+  }
+  return book;
+};
 // 4-delete book
 
 const deleteBook = async (id) => {
@@ -116,4 +134,5 @@ module.exports = {
   getPopularBooks,
   getBooksFilterByShelve,
   getBookById,
+  updateRating,
 };
