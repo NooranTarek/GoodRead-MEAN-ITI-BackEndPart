@@ -7,10 +7,19 @@ const { paginationNum } = process.env;
 
 // 1-get books
 
-const getBooks = async (query) => {
+const getBooks = async () => {
+  const books = await Book.find()
+    .populate('category')
+    .populate('author')
+    .populate('reviews')
+    .catch((err) => {
+      throw new AppError(err.message, 422);
+    });
+  return books;
+};
+const getBooksForPagination = async (query) => {
   // /book?pageNum=1
   // get books pagination
-  console.log(query.pageNum);
   const books = await Book.find()
     .limit(paginationNum)
     .skip((query.pageNum - 1) * paginationNum)
@@ -76,10 +85,14 @@ const getBooksFilterByShelve = async function (query) {
 
 // get book by id
 const getBookById = async (id) => {
-  const book = await Book.findOne({ id }).populate('author').populate('category')
+  console.log('sssss');
+  const book = await Book.findOne({ id })
+    .populate('author')
+    .populate('category')
     .catch((err) => {
       throw new AppError(err.message, 422);
     });
+  console.log(book);
   return book;
 };
 
@@ -136,4 +149,5 @@ module.exports = {
   getBooksFilterByShelve,
   getBookById,
   updateRating,
+  getBooksForPagination,
 };
