@@ -61,7 +61,7 @@ router.get('/shelve', isAuth, allowedTo('user'), async (req, res, next) => {
   return next(err);
 });
 
-// get specific book by id
+// get specific book by id take a query params /id?id=true
 router.get('/:id', isAuth, allowedTo('user'), async (req, res, next) => {
   const [err, book] = await asyncWrapper(
     BookController.getBookById(req.params.id),

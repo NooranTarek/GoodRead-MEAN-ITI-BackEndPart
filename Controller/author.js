@@ -45,6 +45,16 @@ const getPopularAuthors = async () => {
   return authros;
 };
 
+// get author object id by num id
+const getAuthorIdByNumId = async (id) => {
+  const authorId = await Author.findOne({ id }).select('_id')
+    .catch((err) => {
+      throw new AppError(err.message, 422);
+    });
+
+  return authorId;
+};
+
 // get author by id
 const getAuthorById = async (id) => {
   const authorId = new ObjectId(id);
@@ -133,4 +143,5 @@ module.exports = {
   getSpecificAuther,
   getAuthorById,
   getAuthorsPagination,
+  getAuthorIdByNumId,
 };
