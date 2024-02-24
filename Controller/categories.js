@@ -49,11 +49,8 @@ const getPopularCategories = async () => {
   return popularCategories;
 };
 
-const getAllCategories = async (pageNum, pageSize) => {
-  const categories = await Category.find()
-    .limit(pageSize)
-    .skip((pageNum - 1) * pageSize)
-    .exec()
+const getAllCategories = async () => {
+  const categories = await Category.find().select(' -_id id name')
     .catch((err) => {
       // console.log(err);
       throw new AppError(err.message, 500);
@@ -69,16 +66,37 @@ const categoriesName = async () => {
   return categories;
 };
 
-const booksForSpecificCategory = async (categoryId) => {
+const booksForSpecificCategory = async (categoryId, pageNum, pageSize) => {
   const category = await Category.findById({ _id: categoryId }).select('-_id name');
   const categoryBooks = await Book.find({ category: categoryId })
     .populate('author', '-_id firstName lastName')
-    .select('title image -_id').catch((err) => {
+    .select('title image -_id').limit(pageSize)
+    .skip((pageNum - 1) * pageSize)
+    .exec()
+    .catch((err) => {
       throw new AppError(err.message, 500);
     });
   return {
     category,
     books: categoryBooks,
+  };
+};
+
+const getCategoryByObjId = async (_id) => {
+  const category = await Category.findById(_id).catch((err) => {
+    throw new AppError(err.message, 500);
+  });
+  return {
+    category,
+  };
+};
+
+const getCategoryById = async (id) => {
+  const category = await Category.findOne(id).catch((err) => {
+    throw new AppError(err.message, 500);
+  });
+  return {
+    category,
   };
 };
 
@@ -93,4 +111,6 @@ module.exports = {
   getAllCategories,
   categoriesName,
   booksForSpecificCategory,
+  getCategoryByObjId,
+  getCategoryById
 };

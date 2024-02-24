@@ -34,13 +34,10 @@ router.patch('/:id', async (req, res, next) => {
 });
 // isAuth, allowedTo('admin')
 router.delete('/:id', async (req, res, next) => {
-  console.log('ssssssssssssssssssssssssssssssssssssssss');
-  console.log(req.params.id);
   const [err, data] = await asyncWrapper(
     CategoryController.deleteCategory(req.params.id),
   );
   if (!err) {
-    console.log(' inf coorect ');
     res.json({ message: 'Category deleted successfully', data });
     return;
   }
@@ -57,10 +54,8 @@ router.get('/popularCategories', async (req, res, next) => {
 });
 
 router.get('/', async (req, res, next) => {
-  const pageNum = req.query.pageNum ? req.query.pageNum : 1;
-  const pageSize = 10; // Adjust as needed
   const [err, categories] = await asyncWrapper(
-    CategoryController.getAllCategories(pageNum, pageSize),
+    CategoryController.getAllCategories(),
   );
   if (err) next(new AppError(err.message, 400));
   res.json({ categories });
@@ -75,12 +70,31 @@ router.get('/categoriesName', async (req, res, next) => {
 });
 
 router.get('/:id', async (req, res, next) => {
+  const pageNum = req.query.pageNum ? req.query.pageNum : 1;
+  const pageSize = 10; // Adjust as needed
   const [err, categories] = await asyncWrapper(
-    CategoryController.booksForSpecificCategory(req.params.id),
+    CategoryController.booksForSpecificCategory(req.params.id, pageNum, pageSize),
   );
   if (err) next(new AppError(err.message, 400));
   else {
     res.json({ categories });
   }
 });
+
+router.get('', async (req, res, next) => {
+  let category;
+  if (req.params.id) {
+    const cat = await asyncWrapper(CategoryController.getCategoryByObjId(req.params.id));
+    category = cat;
+  } else if (req.query.id) {
+    const cat = await asyncWrapper(CategoryController.getCategoryById(req.query.id));
+    category = cat;
+  }
+  if (category) {
+    res.json({ category });
+  } else {
+    next(new AppError('Category not found', 404));
+  }
+});
+
 module.exports = router;
