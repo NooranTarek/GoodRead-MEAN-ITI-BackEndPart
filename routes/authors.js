@@ -5,7 +5,8 @@ const AppError = require("../lib/appError");
 const { isAuth } = require("../Middleware/authentication");
 const allowedTo = require("../Middleware/authorization");
 // must be a user and login into the website allow for both (user/admin).
-router.get("/", isAuth, allowedTo("admin", "user"), async (req, res, next) => {
+// isAuth, allowedTo("admin", "user"),
+router.get("/", async (req, res, next) => {
   const [err, authors] = await asyncWrapper(AuthorController.getAuthors());
   if (!err) {
     res.json(authors);
@@ -54,8 +55,10 @@ router.get("/:id", isAuth, allowedTo("user"), async (req, res, next) => {
   return next(err);
 });
 // CRUD operation in book allow for adimn only
-
-router.post("/", isAuth, allowedTo("admin"), async (req, res, next) => {
+//isAuth, allowedTo("admin"),
+router.post("/", async (req, res, next) => {
+  req.body.image =
+    "https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
   const [err, data] = await asyncWrapper(AuthorController.create(req.body));
   if (err) {
     return next(err);

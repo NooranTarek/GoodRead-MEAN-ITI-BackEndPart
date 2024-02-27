@@ -80,7 +80,9 @@ const getBooksFilterByShelve = async function (query) {
   ]).catch((err) => {
     throw new AppError(err.message, 422);
   });
-  return books;
+  const count = await Book.countDocuments({ shelve });
+
+  return { books, count };
 };
 
 // get book by id
