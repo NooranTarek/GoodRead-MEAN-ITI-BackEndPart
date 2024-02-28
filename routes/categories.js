@@ -23,6 +23,9 @@ router.patch('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
     res.json({ message: 'Category updated successfully', data });
     return;
   }
+  if (err.message.startsWith('Category name')) {
+    return next(new AppError(err.message, 400));
+  }
   // eslint-disable-next-line consistent-return
   return next(new AppError(err.message, 400));
 });
