@@ -1,7 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 const router = require('express').Router();
 // eslint-disable-next-line import/no-extraneous-dependencies
 const multer = require('multer');
 const { BookController } = require('../Controller');
+const { UserController } = require('../Controller');
 const asyncWrapper = require('../lib/asyncWrapper');
 const AppError = require('../lib/appError');
 const { isAuth } = require('../Middleware/authentication');
@@ -19,9 +21,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // must be a user and login into the website allow for both (user/admin).
-//isAuth, allowedTo("admin", "user"),
-router.get("/", async (req, res, next) => {
-
+// isAuth, allowedTo("admin", "user"),
+router.get('/', async (req, res, next) => {
   const [err, authors] = await asyncWrapper(BookController.getBooks(req.query));
   if (!err) {
     return res.json(authors);
@@ -30,16 +31,15 @@ router.get("/", async (req, res, next) => {
 });
 
 // isAuth,allowedTo("admin", "user"),
-router.get("/pagination", async (req, res, next) => {
+router.get('/pagination', async (req, res, next) => {
   const [err, authors] = await asyncWrapper(
-    BookController.getBooksForPagination(req.query)
+    BookController.getBooksForPagination(req.query),
   );
   if (!err) {
     return res.json(authors);
   }
   return next(err);
 });
-
 
 // in home page can any one without ligin see popular books
 router.get('/popular', async (req, res, next) => {
@@ -52,9 +52,9 @@ router.get('/popular', async (req, res, next) => {
 
 // for user can get books filter by shelve
 
-//isAuth, allowedTo("user"),
-router.get("/shelve", async (req, res, next) => {
-  console.log("here");
+// isAuth, allowedTo("user"),
+router.get('/shelve', async (req, res, next) => {
+  console.log('here');
 
   const [err, books] = await asyncWrapper(
     BookController.getBooksFilterByShelve(req.query),
@@ -65,11 +65,8 @@ router.get("/shelve", async (req, res, next) => {
   return next(err);
 });
 
-
 // get specific book by id isAuth, allowedTo("user")
-router.get("/:id", async (req, res, next) => {
-
-
+router.get('/:id', async (req, res, next) => {
   const [err, book] = await asyncWrapper(
     BookController.getBookById(req.params.id),
   );
@@ -86,19 +83,18 @@ router.get("/:id", async (req, res, next) => {
 
 // CRUD operation in book allow for adimn only
 //  isAuth,allowedTo("admin")
-router.post("/", async (req, res, next) => {
-  req.body.image =
-    "https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+router.post('/', async (req, res, next) => {
+  // req.body.image = 'https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
   const [err, data] = await asyncWrapper(BookController.create(req.body));
   if (err) {
     return next(err);
   }
   if (!data) {
-    return next(new AppError("not created", 422));
+    return next(new AppError('not created', 422));
   }
   const responseData = {
     ...data.toObject(),
-    message: "Created successfully",
+    message: 'Created successfully',
   };
   return res.json(responseData);
 });
@@ -122,10 +118,9 @@ router.post("/", async (req, res, next) => {
 // });
 
 router.patch(
-  "/:id",
-  //// isAuth,
+  '/:id',
+  /// / isAuth,
   // allowedTo("admin", "user"),
-
 
   async (req, res, next) => {
     const [err, data] = await asyncWrapper(
@@ -149,22 +144,46 @@ router.patch(
 );
 router.patch(
 
-  "/:id/rating", // Path without the base URL ?rate=5
-  //isAuth,
-  //allowedTo("admin", "user"),
-
+  '/:id/rating', // Path without the base URL ?rate=5
+  isAuth,
+  allowedTo('admin', 'user'),
+  // add rating in user also in list of books
   async (req, res, next) => {
     const [err, data] = await asyncWrapper(
       BookController.updateRating(req.params.id, req.query.rate),
     );
+    // req.user._id userId, bookId, newRating
+    // eslint-disable-next-line no-underscore-dangle
+    // console.log(`USER ID ${req.user._id}`);
+    await UserController.updateRating(req.user._id, req.params.id, req.query.rate);
     if (!data) {
       return next(new AppError('Book not found', 404));
     }
     if (err) {
       return next(err);
     }
+    const responseData = {
+      ...data.toObject(),
+      message: 'Updated successfully',
+    };
+    return res.json(responseData);
+  },
+);
+router.patch(
+  '/:id/shelve', //shelve all/ read/ want to read /reading
+  isAuth,
+  allowedTo('admin', 'user'),
+  // add rating in user also in list of books
+ 
+    // req.user._id userId, bookId, newRating
+    // eslint-disable-next-line no-underscore-dangle
+    // console.log(`USER ID ${req.user._id}`);
+    await UserController.updateRating(req.user._id, req.params.id, req.query.rate);
     if (!data) {
-      return next(new AppError('not updated successfully', 422));
+      return next(new AppError('Book not found', 404));
+    }
+    if (err) {
+      return next(err);
     }
     const responseData = {
       ...data.toObject(),
@@ -174,23 +193,23 @@ router.patch(
   },
 );
 router.delete(
-  "/:id",
-  /* isAuth, allowedTo("admin"),*/ async (req, res, next) => {
+  '/:id',
+  /* isAuth, allowedTo("admin"), */ async (req, res, next) => {
     const [err, data] = await asyncWrapper(
-      BookController.deleteBook(req.params.id)
+      BookController.deleteBook(req.params.id),
     );
     if (!data) {
-      return next(new AppError("Book not found", 404));
+      return next(new AppError('Book not found', 404));
     }
     if (err) {
       return next(err);
     }
     if (!data) {
-      return next(new AppError("not delete successfully", 422));
+      return next(new AppError('not delete successfully', 422));
     }
-    const responseData = { ...data.toObject(), message: "Delete successfully" };
+    const responseData = { ...data.toObject(), message: 'Delete successfully' };
     return res.json(responseData);
-  }
+  },
 );
 
 module.exports = router;
