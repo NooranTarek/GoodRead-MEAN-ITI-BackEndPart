@@ -5,6 +5,10 @@ const Category = require('../models/category');
 const addCategory = async (userData) => {
   const { name, image } = userData;
   const newCategory = await Category.create({ name, image }).catch((err) => {
+    if (err.code === 11000 && err.keyPattern && err.keyPattern.name) {
+      // Duplicate key error, category name already exists
+      throw new AppError(`Category name "${name}" already exists. Please choose a different name`, 400);
+    } 
     throw new AppError(err.message, 400);
   });
   return newCategory;
@@ -13,11 +17,11 @@ const addCategory = async (userData) => {
 const updateCategory = async (userData, id) => {
   const { name } = userData;
 
-  const updatedCategory = await Category.findByIdAndUpdate({ _id: id }, { name }).catch((err) => {
+  const updatedCategory = await Category.findOneAndUpdate({ id }, { name }).catch((err) => {
     if (err.code === 11000 && err.keyPattern && err.keyPattern.name) {
       // Duplicate key error, category name already exists
-      throw new AppError(Category name "${name}" already exists. Please choose a different name, 400);
-    }
+      throw new AppError(`Category name "${name}" already exists. Please choose a different name`, 400);
+    } 
 
     throw new AppError(err.message, 400);
   });

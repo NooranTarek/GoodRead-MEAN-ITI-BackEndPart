@@ -128,7 +128,7 @@ const updateRating = async (id, newRating) => {
 // 9-delete book
 
 const deleteBook = async (id) => {
-  const book = await Book.findOneAndDelete({ _id: id }).catch((err) => {
+  const book = await Book.findOneAndDelete({ id }).catch((err) => {
     throw new AppError(err.message, 422);
   });
   return book;

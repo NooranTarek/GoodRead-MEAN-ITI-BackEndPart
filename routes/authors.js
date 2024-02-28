@@ -84,7 +84,8 @@ router.post('/', async (req, res, next) => {
   res.json(responseData);
 });
 
-router.patch('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
+// isAuth, allowedTo('admin'),
+router.patch('/:id', async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     AuthorController.update(req.params.id, req.body),
   );
@@ -98,7 +99,8 @@ router.patch('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
   res.json(responseData);
 });
 
-router.delete('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
+// isAuth, allowedTo('admin'), 
+router.delete('/:id', async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     AuthorController.deleteAthor(req.params.id),
   );
