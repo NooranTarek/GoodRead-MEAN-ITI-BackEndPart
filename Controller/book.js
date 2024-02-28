@@ -80,19 +80,19 @@ const getBooksFilterByShelve = async function (query) {
   ]).catch((err) => {
     throw new AppError(err.message, 422);
   });
-  return books;
+  const count = await Book.countDocuments({ shelve });
+
+  return { books, count };
 };
 
 // get book by id
 const getBookById = async (id) => {
-  console.log('sssss');
   const book = await Book.findOne({ id })
     .populate('author')
     .populate('category')
     .catch((err) => {
       throw new AppError(err.message, 422);
     });
-  console.log(book);
   return book;
 };
 
