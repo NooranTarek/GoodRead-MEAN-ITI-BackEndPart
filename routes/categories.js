@@ -29,13 +29,15 @@ router.patch('/:id', async (req, res, next) => {
     res.json({ message: 'Category updated successfully', data });
     return;
   }
+  if (err.message.startsWith('Category name')) {
+    return next(new AppError(err.message, 400));
+  }
   // eslint-disable-next-line consistent-return
   return next(new AppError(err.message, 400));
 });
 
 //  isAuth, allowedTo("admin"),
-router.delete("/:id", async (req, res, next) => {
-
+router.delete('/:id', async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     CategoryController.deleteCategory(req.params.id),
   );

@@ -22,4 +22,5 @@ router.post('/login', async (req, res, next) => {
   // eslint-disable-next-line consistent-return
   return next(new AppError(err.message, 400));
 });
+
 module.exports = router;

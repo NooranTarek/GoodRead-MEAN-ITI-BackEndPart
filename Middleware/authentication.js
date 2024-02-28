@@ -7,7 +7,7 @@ const isAuth = (req, res, next) => {
     const verified = jwt.verify(token, process.env.JWT_KEY); // if true return payload
     if (verified) {
       req.user = verified.userExist;
-      //console.log(verified.userExist);
+      console.log(verified.userExist);
       next();
     }
   } catch (error) {
