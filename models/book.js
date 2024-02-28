@@ -18,21 +18,14 @@ const bookSchema = Schema({
   category: {
     type: Schema.Types.ObjectId, ref: 'Category', required: true,
   },
-  valueOfRating: {
-    type: Number,
-    enum: [0, 1, 2, 3, 4, 5],
-    default: 0,
-  },
   totalRating: {
     type: Number,
     default: 0,
   },
   countOfRating: { type: Number, default: 0 },
-  reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
-  shelve: {
-    type: String,
-    enum: ['read', 'want to read', 'reading'],
-    default: 'want to read',
+  reviews: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+    default: [],
   },
 });
 
