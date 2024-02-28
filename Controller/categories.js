@@ -13,8 +13,10 @@ const addCategory = async (userData) => {
 const updateCategory = async (userData, id) => {
   const { name } = userData;
 
-  const updatedCategory = await Category.findOneAndUpdate({ id }, { name }).catch((err) => {
-
+  const updatedCategory = await Category.findOneAndUpdate(
+    { id },
+    { name }
+  ).catch((err) => {
     throw new AppError(err.message, 400);
   });
   return updatedCategory;
@@ -51,7 +53,8 @@ const getPopularCategories = async () => {
 };
 
 const getAllCategories = async () => {
-  const categories = await Category.find().select(' -_id id name')
+  const categories = await Category.find()
+    .select(" _id id name")
     .catch((err) => {
       // console.log(err);
       throw new AppError(err.message, 500);
@@ -61,12 +64,15 @@ const getAllCategories = async () => {
 };
 
 const categoriesName = async () => {
-  const categories = await Category.find().select('name image id').catch((err) => {
-    throw new AppError(err.message, 500);
-  });
+  console.log("In Categ Names");
+  const categories = await Category.find()
+    .select("name image id _id")
+    .catch((err) => {
+      throw new AppError(err.message, 500);
+    });
+  console.log("In Categ Names", categories);
   return categories;
 };
-
 
 const booksForSpecificCategory = async (categoryId) => {
   const category = await Category.findById({ _id: categoryId }).select(
@@ -75,7 +81,6 @@ const booksForSpecificCategory = async (categoryId) => {
   const categoryBooks = await Book.find({ category: categoryId })
     .populate("author", "-_id firstName lastName")
     .select("title image -_id")
-
 
     .catch((err) => {
       throw new AppError(err.message, 500);
@@ -104,7 +109,6 @@ const getCategoryById = async (id) => {
   };
 };
 
-
 module.exports = {
   addCategory,
   updateCategory,
@@ -114,5 +118,5 @@ module.exports = {
   categoriesName,
   booksForSpecificCategory,
   getCategoryByObjId,
-  getCategoryById
+  getCategoryById,
 };
