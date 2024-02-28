@@ -1,9 +1,9 @@
 /* eslint-disable no-underscore-dangle */
-const dotenv = require("dotenv");
-const Book = require("../models/book");
-const Author = require("../models/author");
-const AppError = require("../lib/appError");
-const { ObjectId } = require("mongoose").Types;
+const dotenv = require('dotenv');
+const Book = require('../models/book');
+const Author = require('../models/author');
+const AppError = require('../lib/appError');
+const { ObjectId } = require('mongoose').Types;
 
 dotenv.config();
 const { paginationNum } = process.env || 100;
@@ -32,7 +32,7 @@ const getPopularAuthors = async () => {
   const authros = await Book.aggregate([
     {
       $group: {
-        _id: "$author",
+        _id: '$author',
         totalBooks: { $sum: 1 },
       },
     },
@@ -45,6 +45,16 @@ const getPopularAuthors = async () => {
   return authros;
 };
 
+// get author object id by num id
+const getAuthorIdByNumId = async (id) => {
+  const authorId = await Author.findOne({ id }).select('_id')
+    .catch((err) => {
+      throw new AppError(err.message, 422);
+    });
+
+  return authorId;
+};
+
 // get author by id
 const getAuthorById = async (id) => {
   const authorId = new ObjectId(id);
@@ -52,13 +62,13 @@ const getAuthorById = async (id) => {
     { $match: { author: authorId } },
     {
       $lookup: {
-        from: "authors",
-        localField: "author",
-        foreignField: "_id",
-        as: "author",
+        from: 'authors',
+        localField: 'author',
+        foreignField: '_id',
+        as: 'author',
       },
     },
-    { $unwind: "$author" },
+    { $unwind: '$author' },
     {
       $project: {
         id: 1,
@@ -68,10 +78,10 @@ const getAuthorById = async (id) => {
         countOfRating: 1,
         shelve: 1,
         author: {
-          fullName: { $concat: ["$author.firstName", " ", "$author.lastName"] },
-          image: "$author.image",
-          dob: "$author.dob",
-          description: "$author.description",
+          fullName: { $concat: ['$author.firstName', ' ', '$author.lastName'] },
+          image: '$author.image',
+          dob: '$author.dob',
+          description: '$author.description',
         },
       },
     },
@@ -97,7 +107,7 @@ const update = async (id, data) => {
   const author = await Author.findOneAndUpdate({ _id: id }, data).catch(
     (err) => {
       throw new AppError(err.message, 422);
-    }
+    },
   );
   return author;
 };
@@ -114,10 +124,10 @@ const deleteAthor = async (id) => {
 
 const getSpecificAuther = async (authorId) => {
   const author = await Author.findById(authorId).select(
-    "-_id firstName lastName image dob"
+    '-_id firstName lastName image dob',
   );
   const books = await Book.find({ author: authorId })
-    .select("-_id title image valueOfRating countOfRating")
+    .select('-_id title image valueOfRating countOfRating')
     .catch((err) => {
       throw new AppError(err.message, 422);
     });
@@ -133,4 +143,5 @@ module.exports = {
   getSpecificAuther,
   getAuthorById,
   getAuthorsPagination,
+  getAuthorIdByNumId,
 };
