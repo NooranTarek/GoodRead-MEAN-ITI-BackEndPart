@@ -37,4 +37,23 @@ const login = async (userData) => {
     }
   }
 };
-module.exports = { register, login };
+const updateRating = async (userId, bookId, newRating) => {
+  try {
+    const user = await Users.findById(userId);
+    // console.log(`check if found user ${user}`);
+    const bookIndex = user.books.findIndex((book) => book.idOfBook.toString() === bookId);
+
+    if (bookIndex !== -1) {
+      user.books[bookIndex].rating = newRating;
+    } else {
+      user.books.push({ idOfBook: bookId, rating: newRating });
+    }
+
+    await user.save();
+
+    return { success: true, message: 'Rating updated successfully' };
+  } catch (error) {
+    return { success: false, message: 'Error updating rating', error };
+  }
+};
+module.exports = { register, login, updateRating };

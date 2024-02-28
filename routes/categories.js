@@ -34,8 +34,7 @@ router.patch('/:id', async (req, res, next) => {
 });
 
 //  isAuth, allowedTo("admin"),
-router.delete("/:id", async (req, res, next) => {
-
+router.delete('/:id', async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     CategoryController.deleteCategory(req.params.id),
   );
