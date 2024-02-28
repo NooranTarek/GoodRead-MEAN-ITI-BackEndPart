@@ -13,7 +13,12 @@ const addCategory = async (userData) => {
 const updateCategory = async (userData, id) => {
   const { name } = userData;
 
-  const updatedCategory = await Category.findOneAndUpdate({ id }, { name }).catch((err) => {
+  const updatedCategory = await Category.findByIdAndUpdate({ _id: id }, { name }).catch((err) => {
+    if (err.code === 11000 && err.keyPattern && err.keyPattern.name) {
+      // Duplicate key error, category name already exists
+      throw new AppError(`Category name "${name}" already exists. Please choose a different name`, 400);
+    } 
+
 
     throw new AppError(err.message, 400);
   });
@@ -61,11 +66,9 @@ const getAllCategories = async () => {
 };
 
 const categoriesName = async () => {
-  const categories = await Category.find()
-    .select("-_id name image id")
-    .catch((err) => {
-      throw new AppError(err.message, 500);
-    });
+  const categories = await Category.find().select('name image id').catch((err) => {
+    throw new AppError(err.message, 500);
+  });
   return categories;
 };
 
@@ -106,9 +109,7 @@ const getCategoryById = async (id) => {
   };
 };
 
-// GetAllCategoriesByName ==> get
-// GetAllForEachCateogry(Book Nme , Author name)
-// getSpecificAuthorById
+
 module.exports = {
   addCategory,
   updateCategory,
