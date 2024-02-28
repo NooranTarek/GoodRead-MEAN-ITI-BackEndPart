@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const usersSchema = new mongoose.Schema(
   {
@@ -9,7 +9,6 @@ const usersSchema = new mongoose.Schema(
     },
     username: {
       type: String,
-      required: true,
       unique: true,
       validate: {
         validator(value) {
@@ -40,7 +39,7 @@ const usersSchema = new mongoose.Schema(
     },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, default: 'user', enum: ['user', 'admin'] },
+    role: { type: String, default: "user", enum: ["user", "admin"] },
     image: { type: String },
   },
   {
@@ -51,17 +50,18 @@ const usersSchema = new mongoose.Schema(
         return ret;
       },
     },
-  },
+  }
 );
 
-usersSchema.pre('save', async function (next) {
+usersSchema.pre("save", async function (next) {
   if (this.isNew) {
     const users = await this.constructor.find().sort({ id: -1 });
     if (users.length === 0) this.id = 1;
     else this.id = users[0].id + 1;
   }
+  this.username = this.firstName + this.lastName + this.id;
   next();
 });
-const Users = mongoose.model('Users', usersSchema);
+const Users = mongoose.model("Users", usersSchema);
 
 module.exports = Users;
