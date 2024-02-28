@@ -1,6 +1,6 @@
-const AppError = require("../lib/appError");
-const Book = require("../models/book");
-const Category = require("../models/category");
+const AppError = require('../lib/appError');
+const Book = require('../models/book');
+const Category = require('../models/category');
 
 const addCategory = async (userData) => {
   const { name, image } = userData;
@@ -22,6 +22,7 @@ const updateCategory = async (userData, id) => {
       // Duplicate key error, category name already exists
       throw new AppError(`Category name "${name}" already exists. Please choose a different name`, 400);
     } 
+
     throw new AppError(err.message, 400);
   });
   return updatedCategory;
@@ -36,17 +37,17 @@ const getPopularCategories = async () => {
   const popularCategories = await Category.aggregate([
     {
       $lookup: {
-        from: "books",
-        localField: "_id",
-        foreignField: "category",
-        as: "booksInCategory",
+        from: 'books',
+        localField: '_id',
+        foreignField: 'category',
+        as: 'booksInCategory',
       },
     },
     {
       $project: {
         _id: 1,
         name: 1,
-        bookCount: { $size: "$booksInCategory" },
+        bookCount: { $size: '$booksInCategory' },
       },
     },
     { $sort: { bookCount: -1 } },
@@ -74,15 +75,13 @@ const categoriesName = async () => {
   return categories;
 };
 
-
 const booksForSpecificCategory = async (categoryId) => {
   const category = await Category.findById({ _id: categoryId }).select(
-    "-_id name"
+    '-_id name',
   );
   const categoryBooks = await Book.find({ category: categoryId })
-    .populate("author", "-_id firstName lastName")
-    .select("title image -_id")
-
+    .populate('author', '-_id firstName lastName')
+    .select('title image -_id')
 
     .catch((err) => {
       throw new AppError(err.message, 500);
@@ -111,7 +110,6 @@ const getCategoryById = async (id) => {
   };
 };
 
-
 module.exports = {
   addCategory,
   updateCategory,
@@ -121,5 +119,5 @@ module.exports = {
   categoriesName,
   booksForSpecificCategory,
   getCategoryByObjId,
-  getCategoryById
+  getCategoryById,
 };
