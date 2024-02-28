@@ -60,7 +60,7 @@ const getAllCategories = async () => {
 };
 
 const categoriesName = async () => {
-  const categories = await Category.find().select('-_id name image id').catch((err) => {
+  const categories = await Category.find().select('name image id').catch((err) => {
     throw new AppError(err.message, 500);
   });
   return categories;
