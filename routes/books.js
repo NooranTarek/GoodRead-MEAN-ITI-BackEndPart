@@ -170,16 +170,19 @@ router.patch(
   },
 );
 router.patch(
-  '/:id/shelve', //shelve all/ read/ want to read /reading
+  '/:id/shelve', // shelve?shelve=(read/ want to read /reading)
   isAuth,
   allowedTo('admin', 'user'),
   // add rating in user also in list of books
- 
-    // req.user._id userId, bookId, newRating
-    // eslint-disable-next-line no-underscore-dangle
-    // console.log(`USER ID ${req.user._id}`);
-    await UserController.updateRating(req.user._id, req.params.id, req.query.rate);
-    if (!data) {
+  async (req, res, next) => {
+    // const [err, data] =
+
+    await UserController.updateShelve(
+      req.user._id,
+      req.params.id,
+      req.query.shelve,
+    );
+    /* if (!data) {
       return next(new AppError('Book not found', 404));
     }
     if (err) {
@@ -188,8 +191,8 @@ router.patch(
     const responseData = {
       ...data.toObject(),
       message: 'Updated successfully',
-    };
-    return res.json(responseData);
+    }; */
+    return res.json('updated successfully');
   },
 );
 router.delete(
