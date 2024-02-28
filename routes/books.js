@@ -1,18 +1,45 @@
 const router = require('express').Router();
+// eslint-disable-next-line import/no-extraneous-dependencies
+const multer = require('multer');
 const { BookController } = require('../Controller');
 const asyncWrapper = require('../lib/asyncWrapper');
 const AppError = require('../lib/appError');
 const { isAuth } = require('../Middleware/authentication');
 const allowedTo = require('../Middleware/authorization');
 
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, 'public/images');
+  },
+  filename(req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
 // must be a user and login into the website allow for both (user/admin).
-router.get('/', isAuth, allowedTo('admin', 'user'), async (req, res, next) => {
+//isAuth, allowedTo("admin", "user"),
+router.get("/", async (req, res, next) => {
+
   const [err, authors] = await asyncWrapper(BookController.getBooks(req.query));
   if (!err) {
     return res.json(authors);
   }
   return next(err);
 });
+
+// isAuth,allowedTo("admin", "user"),
+router.get("/pagination", async (req, res, next) => {
+  const [err, authors] = await asyncWrapper(
+    BookController.getBooksForPagination(req.query)
+  );
+  if (!err) {
+    return res.json(authors);
+  }
+  return next(err);
+});
+
 
 // in home page can any one without ligin see popular books
 router.get('/popular', async (req, res, next) => {
@@ -24,7 +51,11 @@ router.get('/popular', async (req, res, next) => {
 });
 
 // for user can get books filter by shelve
-router.get('/shelve', isAuth, allowedTo('user'), async (req, res, next) => {
+
+//isAuth, allowedTo("user"),
+router.get("/shelve", async (req, res, next) => {
+  console.log("here");
+
   const [err, books] = await asyncWrapper(
     BookController.getBooksFilterByShelve(req.query),
   );
@@ -34,8 +65,11 @@ router.get('/shelve', isAuth, allowedTo('user'), async (req, res, next) => {
   return next(err);
 });
 
-// get specific book by id
-router.get('/:id', isAuth, allowedTo('user'), async (req, res, next) => {
+
+// get specific book by id isAuth, allowedTo("user")
+router.get("/:id", async (req, res, next) => {
+
+
   const [err, book] = await asyncWrapper(
     BookController.getBookById(req.params.id),
   );
@@ -51,23 +85,48 @@ router.get('/:id', isAuth, allowedTo('user'), async (req, res, next) => {
 });
 
 // CRUD operation in book allow for adimn only
-
-router.post('/', isAuth, allowedTo('admin'), async (req, res, next) => {
+//  isAuth,allowedTo("admin")
+router.post("/", async (req, res, next) => {
+  req.body.image =
+    "https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
   const [err, data] = await asyncWrapper(BookController.create(req.body));
   if (err) {
     return next(err);
   }
   if (!data) {
-    return next(new AppError('not created', 422));
+    return next(new AppError("not created", 422));
   }
-  const responseData = { ...data.toObject(), message: 'Created successfully' };
+  const responseData = {
+    ...data.toObject(),
+    message: "Created successfully",
+  };
   return res.json(responseData);
 });
+// ================ With Image ==================\\
+// router.post("/", upload.single("image"), async (req, res, next) => {
+//   const imageOriginalName = req.file.originalname;
+//   req.body.image = imageOriginalName;
+//   const [err, data] = await asyncWrapper(BookController.create(req.body));
+
+//   if (err) {
+//     return next(err);
+//   }
+//   if (!data) {
+//     return next(new AppError("not created", 422));
+//   }
+//   const responseData = {
+//     ...data.toObject(),
+//     message: "Created successfully",
+//   };
+//   return res.json(responseData);
+// });
 
 router.patch(
-  '/:id',
-  isAuth,
-  allowedTo('admin', 'user'),
+  "/:id",
+  //// isAuth,
+  // allowedTo("admin", "user"),
+
+
   async (req, res, next) => {
     const [err, data] = await asyncWrapper(
       BookController.update(req.params.id, req.body),
@@ -88,21 +147,50 @@ router.patch(
     return res.json(responseData);
   },
 );
+router.patch(
 
-router.delete('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
-  const [err, data] = await asyncWrapper(
-    BookController.deleteBook(req.params.id),
-  );
-  if (!data) {
-    return next(new AppError('Book not found', 404));
+  "/:id/rating", // Path without the base URL ?rate=5
+  //isAuth,
+  //allowedTo("admin", "user"),
+
+  async (req, res, next) => {
+    const [err, data] = await asyncWrapper(
+      BookController.updateRating(req.params.id, req.query.rate),
+    );
+    if (!data) {
+      return next(new AppError('Book not found', 404));
+    }
+    if (err) {
+      return next(err);
+    }
+    if (!data) {
+      return next(new AppError('not updated successfully', 422));
+    }
+    const responseData = {
+      ...data.toObject(),
+      message: 'Updated successfully',
+    };
+    return res.json(responseData);
+  },
+);
+router.delete(
+  "/:id",
+  /* isAuth, allowedTo("admin"),*/ async (req, res, next) => {
+    const [err, data] = await asyncWrapper(
+      BookController.deleteBook(req.params.id)
+    );
+    if (!data) {
+      return next(new AppError("Book not found", 404));
+    }
+    if (err) {
+      return next(err);
+    }
+    if (!data) {
+      return next(new AppError("not delete successfully", 422));
+    }
+    const responseData = { ...data.toObject(), message: "Delete successfully" };
+    return res.json(responseData);
   }
-  if (err) {
-    return next(err);
-  }
-  if (!data) {
-    return next(new AppError('not delete successfully', 422));
-  }
-  const responseData = { ...data.toObject(), message: 'Delete successfully' };
-  return res.json(responseData);
-});
+);
+
 module.exports = router;

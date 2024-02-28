@@ -10,14 +10,23 @@ const { paginationNum } = process.env || 100;
 
 // 1-get authors
 
-const getAuthors = async (query) => { // author?pageNum=1,popular=(true or false)
-  const authros = await Author.find().limit(paginationNum).skip((query.pageNum - 1) * paginationNum)
+const getAuthors = async () => {
+  // author?pageNum=1,popular=(true or false)
+  const authros = await Author.find().catch((err) => {
+    throw new AppError(err.message, 400);
+  });
+  return authros;
+};
+const getAuthorsPagination = async (query) => {
+  // author?pageNum=1,popular=(true or false)
+  const authros = await Author.find()
+    .limit(paginationNum)
+    .skip((query.pageNum - 1) * paginationNum)
     .catch((err) => {
       throw new AppError(err.message, 400);
     });
   return authros;
 };
-
 const getPopularAuthors = async () => {
   // get popular authors that have the heighest num of books / apply pagination also
   const authros = await Book.aggregate([
@@ -30,11 +39,20 @@ const getPopularAuthors = async () => {
     { $sort: { $totalBooks: -1 } },
     // { $skip: (query.pageNum - 1) * paginationNum },
     { $limit: paginationNum },
-  ])
-    .catch((err) => {
-      throw new AppError(err.message, 400);
-    });
+  ]).catch((err) => {
+    throw new AppError(err.message, 400);
+  });
   return authros;
+};
+
+// get author object id by num id
+const getAuthorIdByNumId = async (id) => {
+  const authorId = await Author.findOne({ id }).select('_id')
+    .catch((err) => {
+      throw new AppError(err.message, 422);
+    });
+
+  return authorId;
 };
 
 // get author by id
@@ -77,38 +95,40 @@ const getAuthorById = async (id) => {
 
 const create = async (data) => {
   // eslint-disable-next-line no-param-reassign
-  const author = await Author.create(data)
-    .catch((err) => {
-      throw new AppError(err.message, 400);
-    });
+  const author = await Author.create(data).catch((err) => {
+    throw new AppError(err.message, 400);
+  });
   return author;
 };
 
 // 3-update author
 
 const update = async (id, data) => {
-  const author = await Author.findOneAndUpdate({ _id: id }, data)
-    .catch((err) => {
+  const author = await Author.findOneAndUpdate({ _id: id }, data).catch(
+    (err) => {
       throw new AppError(err.message, 422);
-    });
+    },
+  );
   return author;
 };
 
 // 4-delete author
 
 const deleteAthor = async (id) => {
-  const author = await Author.findOneAndDelete({ _id: id })
-    .catch((err) => {
-      throw new AppError(err.message, 422);
-    });
+  const author = await Author.findOneAndDelete({ _id: id }).catch((err) => {
+    throw new AppError(err.message, 422);
+  });
   return author;
 };
 // get specific author by id
 
 const getSpecificAuther = async (authorId) => {
-  const author = await Author.findById(authorId).select('-_id firstName lastName image dob');
+  const author = await Author.findById(authorId).select(
+    '-_id firstName lastName image dob',
+  );
   const books = await Book.find({ author: authorId })
-    .select('-_id title image valueOfRating countOfRating').catch((err) => {
+    .select('-_id title image valueOfRating countOfRating')
+    .catch((err) => {
       throw new AppError(err.message, 422);
     });
   return { author, books };
@@ -122,4 +142,6 @@ module.exports = {
   getPopularAuthors,
   getSpecificAuther,
   getAuthorById,
+  getAuthorsPagination,
+  getAuthorIdByNumId,
 };
