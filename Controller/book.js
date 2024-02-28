@@ -119,7 +119,7 @@ const update = async (id, data) => {
 
 const updateRating = async (id, newRating) => {
   const book = await Book.findOneAndUpdate(
-    { id },
+    { _id: id },
     {
       $inc: { countOfRating: 1, totalRating: newRating },
     },
@@ -130,6 +130,7 @@ const updateRating = async (id, newRating) => {
   if (!book) {
     throw new AppError('Book not found', 404);
   }
+
   return book;
 };
 // 4-delete book
