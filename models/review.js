@@ -7,7 +7,7 @@ const reviewsSchema = Schema({
     type: Number,
     unique: true,
   },
-  user: { type: Schema.Types.ObjectId, ref: 'User' },
+  user: { type: Schema.Types.ObjectId, ref: 'Users' },
   book: { type: Schema.Types.ObjectId, ref: 'Book' },
   content: { type: String, required: true },
 });
