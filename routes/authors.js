@@ -26,7 +26,7 @@ router.get('/', async (req, res, next) => {
   return next(err);
 });
 // isAuth,allowedTo('admin', 'user')
-
+// get authors pagination
 router.get(
   '/pagination',
   async (req, res, next) => {
@@ -41,6 +41,7 @@ router.get(
 );
 
 // in home page can any one without login see popular authors
+
 router.get('/popular', async (req, res, next) => {
   const [err, authors] = await asyncWrapper(
     AuthorController.getPopularAuthors(),
@@ -65,7 +66,6 @@ router.get('/:id', async (req, res, next) => {
     }
     return next(err);
   }
-  console.log(req.params.id);
   const [err, author] = await asyncWrapper(
     AuthorController.getAuthorById(req.params.id),
   );

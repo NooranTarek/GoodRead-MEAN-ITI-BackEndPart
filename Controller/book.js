@@ -20,6 +20,7 @@ const getBooks = async () => {
   return books;
 };
 // 2-get books for pagination
+
 const getBooksForPagination = async (query) => {
   // /book?pageNum=1
   // get books pagination
@@ -39,7 +40,7 @@ const getBooksForPagination = async (query) => {
 const getPopularBooks = async () => {
   const books = await Book.find()
     .sort({ countOfRating: -1 })
-    .limit(paginationNum)
+    .limit(6)
     .populate('category')
     .populate('author')
     .populate('reviews')
@@ -51,11 +52,11 @@ const getPopularBooks = async () => {
 
 // eslint-disable-next-line max-len
 // 4- get specific book filter by shelve value sended in query params book/shelve?pageNum=1&shelve=reading/read
+
 const getBooksFilterByShelve = async (id, query) => {
   const { pageNum = 1, shelve } = query;
   const perPage = process.env.paginationNum || 10;
 
-  // const user = await User.findById(id2)
   const user = await User.findById(id)
     .populate({
       path: 'books',
@@ -89,6 +90,7 @@ const getBooksFilterByShelve = async (id, query) => {
 };
 
 // 5-get book by id
+
 const getBookById = async (id) => {
   const book = await Book.findOne({ id })
     .populate('author')
@@ -147,7 +149,7 @@ const deleteBook = async (id) => {
   return book;
 };
 
-// 10-create review for bookk for specific user  .createReview(idOfUser,body(content), idOfBook)
+// 10-create review for bookk for specific user .createReview(idOfUser,body(content), idOfBook)
 
 const createReview = async (userId, data, bookId) => {
   data.user = userId;
@@ -157,6 +159,7 @@ const createReview = async (userId, data, bookId) => {
   });
   return review;
 };
+
 module.exports = {
   getBooks,
   create,

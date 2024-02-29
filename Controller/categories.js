@@ -6,7 +6,6 @@ const addCategory = async (userData) => {
   const { name, image } = userData;
   const newCategory = await Category.create({ name, image }).catch((err) => {
     if (err.code === 11000 && err.keyPattern && err.keyPattern.name) {
-      // Duplicate key error, category name already exists
       throw new AppError(`Category name "${name}" already exists. Please choose a different name`, 400);
     }
     throw new AppError(err.message, 400);
@@ -19,7 +18,6 @@ const updateCategory = async (userData, id) => {
 
   const updatedCategory = await Category.findOneAndUpdate({ id }, { name }).catch((err) => {
     if (err.code === 11000 && err.keyPattern && err.keyPattern.name) {
-      // Duplicate key error, category name already exists
       throw new AppError(`Category name "${name}" already exists. Please choose a different name`, 400);
     }
 
@@ -94,7 +92,6 @@ const booksForSpecificCategory = async (categoryId, page, pageSize) => {
   if (!category) {
     throw new AppError('Category not found', 404);
   }
-
 
   const categoryBooks = await Book.find({ category: categoryId })
     .populate('author', '-_id firstName lastName')
