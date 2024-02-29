@@ -60,7 +60,8 @@ const getPopularCategories = async () => {
 
 const getAllCategories = async () => {
   const categories = await Category.find()
-    .select(' -_id id name')
+    .select('_id id name')
+
     .catch((err) => {
       // console.log(err);
       throw new AppError(err.message, 500);
@@ -93,6 +94,7 @@ const booksForSpecificCategory = async (categoryId, page, pageSize) => {
   if (!category) {
     throw new AppError('Category not found', 404);
   }
+
 
   const categoryBooks = await Book.find({ category: categoryId })
     .populate('author', '-_id firstName lastName')
