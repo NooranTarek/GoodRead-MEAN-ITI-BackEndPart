@@ -33,7 +33,8 @@ const getBooksForPagination = async (query) => {
     .catch((err) => {
       throw new AppError(err.message, 422);
     });
-  return books;
+  const bookCount = await Book.countDocuments();
+  return { books, bookCount };
 };
 
 // 3- get popular book

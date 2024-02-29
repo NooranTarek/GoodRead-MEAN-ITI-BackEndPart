@@ -41,8 +41,9 @@ const getPopularAuthors = async () => {
         totalBooks: { $sum: 1 },
       },
     },
-    { $sort: { totalBooks: -1 } },
-    { $limit: 6 },
+    {
+      $sort: { totalBooks: -1 },
+    },
     {
       $lookup: {
         from: 'authors',
@@ -50,6 +51,20 @@ const getPopularAuthors = async () => {
         foreignField: '_id',
         as: 'authorDetails',
       },
+    },
+    {
+      $unwind: '$authorDetails',
+    },
+    {
+      $project: {
+        _id: '$authorDetails._id',
+        firstName: '$authorDetails.firstName',
+        lastName: '$authorDetails.lastName',
+        image: '$authorDetails.image',
+      },
+    },
+    {
+      $limit: 6,
     },
   ]).catch((err) => {
     throw new AppError(err.message, 400);
