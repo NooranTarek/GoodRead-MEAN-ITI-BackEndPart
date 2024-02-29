@@ -1,24 +1,12 @@
 const router = require('express').Router();
-const multer = require('multer');
 const { AdminController } = require('../Controller');
 const asyncWrapper = require('../lib/asyncWrapper');
 const AppError = require('../lib/appError');
 const { isAuth } = require('../Middleware/authentication');
 const allowedTo = require('../Middleware/authorization');
 
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, 'public/images/users');
-  },
-  filename(req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-const upload = multer({ storage });
 
-router.post('/', upload.single('image'), isAuth, allowedTo('admin'), async (req, res, next) => {
-  const imageOriginalName = req.file.originalname;
-  req.body.image = imageOriginalName;
+router.post('/', isAuth, allowedTo('admin'), async (req, res, next) => {
   const [err, data] = await asyncWrapper(AdminController.addAdmin(req.body));
   if (!err) {
     res.json({ message: 'Admin created successfully', data });
