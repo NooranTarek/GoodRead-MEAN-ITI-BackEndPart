@@ -7,7 +7,7 @@ const { isAuth } = require('../Middleware/authentication');
 const allowedTo = require('../Middleware/authorization');
 
 // isAuth, allowedTo("admin"),
-router.post('/', isAuth, allowedTo("admin"), async(req, res, next) => {
+router.post('/', isAuth, allowedTo('admin'), async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     CategoryController.addCategory(req.body),
   );
@@ -34,7 +34,7 @@ router.patch('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
 });
 
 //  isAuth, allowedTo("admin"),
-router.delete('/:id', isAuth, allowedTo("admin"), async (req, res, next) => {
+router.delete('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     CategoryController.deleteCategory(req.params.id),
   );
@@ -62,7 +62,7 @@ router.get('/', async (req, res, next) => {
   res.json({ categories });
 });
 
-router.get('/categoriesName', async (req, res, next) => {
+router.get('/categoriesName',isAuth, allowedTo("user"), async (req, res, next) => {
   const [err, categories] = await asyncWrapper(
     CategoryController.categoriesName(),
   );
@@ -70,11 +70,12 @@ router.get('/categoriesName', async (req, res, next) => {
   res.json({ categories });
 });
 
-router.get('/:id', async (req, res, next) => {
-  const pageNum = req.query.pageNum ? req.query.pageNum : 1;
-  const pageSize = 10; // Adjust as needed
+router.get('/:id',isAuth, allowedTo("user"), async (req, res, next) => {
+  const categoryId = req.params.id;
+  const page = req.query.page || 1;
+  const pageSize = req.query.pageSize || 5;
   const [err, categories] = await asyncWrapper(
-    CategoryController.booksForSpecificCategory(req.params.id, pageNum, pageSize),
+    CategoryController.booksForSpecificCategory(categoryId, page, pageSize),
   );
   if (err) next(new AppError(err.message, 400));
   else {

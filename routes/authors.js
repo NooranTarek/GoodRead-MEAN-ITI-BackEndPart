@@ -1,9 +1,22 @@
 const router = require('express').Router();
+const multer = require('multer');
 const { AuthorController } = require('../Controller');
 const asyncWrapper = require('../lib/asyncWrapper');
 const AppError = require('../lib/appError');
 const { isAuth } = require('../Middleware/authentication');
 const allowedTo = require('../Middleware/authorization');
+
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, 'public/images/authors');
+  },
+  filename(req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
 // must be a user and login into the website allow for both (user/admin). isAuth, allowedTo('admin', 'user'),
 router.get('/', async (req, res, next) => {
   const [err, authors] = await asyncWrapper(AuthorController.getAuthors());
@@ -13,7 +26,7 @@ router.get('/', async (req, res, next) => {
   return next(err);
 });
 // isAuth,allowedTo('admin', 'user')
-
+// get authors pagination
 router.get(
   '/pagination',
   async (req, res, next) => {
@@ -28,6 +41,7 @@ router.get(
 );
 
 // in home page can any one without login see popular authors
+
 router.get('/popular', async (req, res, next) => {
   const [err, authors] = await asyncWrapper(
     AuthorController.getPopularAuthors(),
@@ -52,7 +66,6 @@ router.get('/:id', async (req, res, next) => {
     }
     return next(err);
   }
-  console.log(req.params.id);
   const [err, author] = await asyncWrapper(
     AuthorController.getAuthorById(req.params.id),
   );
@@ -70,9 +83,9 @@ router.get('/:id', async (req, res, next) => {
 // CRUD operation in book allow for adimn only
 
 // isAuth, allowedTo("admin"),
-router.post('/', async (req, res, next) => {
-  // req.body.image = 'https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
-  console.log('aitj');
+router.post('/', upload.single('image'), async (req, res, next) => {
+  const imageOriginalName = req.file.originalname;
+  req.body.image = imageOriginalName;
   const [err, data] = await asyncWrapper(AuthorController.create(req.body));
   if (err) {
     return next(err);
@@ -99,7 +112,7 @@ router.patch('/:id', async (req, res, next) => {
   res.json(responseData);
 });
 
-// isAuth, allowedTo('admin'), 
+// isAuth, allowedTo('admin'),
 router.delete('/:id', async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     AuthorController.deleteAthor(req.params.id),

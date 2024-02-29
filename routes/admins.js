@@ -5,6 +5,7 @@ const AppError = require('../lib/appError');
 const { isAuth } = require('../Middleware/authentication');
 const allowedTo = require('../Middleware/authorization');
 
+
 router.post('/', isAuth, allowedTo('admin'), async (req, res, next) => {
   const [err, data] = await asyncWrapper(AdminController.addAdmin(req.body));
   if (!err) {

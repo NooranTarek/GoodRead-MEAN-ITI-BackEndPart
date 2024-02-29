@@ -6,7 +6,7 @@ const Users = require('../models/user');
 // module.exports = { register };
 const register = async (userData) => {
   const {
-    firstName, lastName, email, password,
+    firstName, lastName, email, password, image,
   } = userData;
   const hashedPassword = await hashFunction({ plainText: password });
   const newUser = await Users.create({
@@ -14,6 +14,7 @@ const register = async (userData) => {
     lastName,
     email,
     password: hashedPassword,
+    image,
   }).catch((err) => {
     throw new AppError(err.message, 400);
   });
@@ -42,6 +43,7 @@ const login = async (userData) => {
     }
   }
 };
+// user make rating
 const updateRating = async (userId, bookId, newRating) => {
   try {
     const user = await Users.findById(userId);
@@ -62,6 +64,8 @@ const updateRating = async (userId, bookId, newRating) => {
   }
 };
 
+// user add book to his list
+
 const updateShelve = async (userId, bookId, newShelf) => {
   try {
     const user = await Users.findById(userId);
@@ -81,6 +85,7 @@ const updateShelve = async (userId, bookId, newShelf) => {
     return { success: false, message: 'Error updating shelf', error };
   }
 };
+
 module.exports = {
   register, login, updateRating, updateShelve,
 };

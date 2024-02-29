@@ -8,7 +8,7 @@ const { ObjectId } = require('mongoose').Types;
 dotenv.config();
 const { paginationNum } = process.env || 100;
 
-// 1-get authors
+// 1-get all authors for admin page sss
 
 const getAuthors = async () => {
   // author?pageNum=1,popular=(true or false)
@@ -17,6 +17,9 @@ const getAuthors = async () => {
   });
   return authros;
 };
+
+// 2-get all authors for user page
+
 const getAuthorsPagination = async (query) => {
   // author?pageNum=1,popular=(true or false)
   const authros = await Author.find()
@@ -27,35 +30,51 @@ const getAuthorsPagination = async (query) => {
     });
   return authros;
 };
+
+// 3-gell poplular authors for home page
+
 const getPopularAuthors = async () => {
-  // get popular authors that have the heighest num of books / apply pagination also
-  const authros = await Book.aggregate([
+  const authors = await Book.aggregate([
     {
       $group: {
         _id: '$author',
         totalBooks: { $sum: 1 },
       },
     },
-    { $sort: { $totalBooks: -1 } },
-    // { $skip: (query.pageNum - 1) * paginationNum },
-    { $limit: paginationNum },
+    {
+      $sort: { totalBooks: -1 },
+    },
+    {
+      $lookup: {
+        from: 'authors',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'authorDetails',
+      },
+    },
+    {
+      $unwind: '$authorDetails',
+    },
+    {
+      $project: {
+        _id: '$authorDetails._id',
+        firstName: '$authorDetails.firstName',
+        lastName: '$authorDetails.lastName',
+        image: '$authorDetails.image',
+      },
+    },
+    {
+      $limit: 6,
+    },
   ]).catch((err) => {
     throw new AppError(err.message, 400);
   });
-  return authros;
+
+  return authors;
 };
 
-// get author object id by num id
-const getAuthorIdByNumId = async (id) => {
-  const authorId = await Author.findOne({ id }).select('_id')
-    .catch((err) => {
-      throw new AppError(err.message, 422);
-    });
+// 4-get author by id
 
-  return authorId;
-};
-
-// get author by id
 const getAuthorById = async (id) => {
   const authorId = new ObjectId(id);
   const books = await Book.aggregate([
@@ -91,36 +110,8 @@ const getAuthorById = async (id) => {
 
   return books;
 };
-// 2-create author
 
-const create = async (data) => {
-  // eslint-disable-next-line no-param-reassign
-  const author = await Author.create(data).catch((err) => {
-    throw new AppError(err.message, 400);
-  });
-  return author;
-};
-
-// 3-update author
-
-const update = async (id, data) => {
-  const author = await Author.findOneAndUpdate({ _id: id }, data).catch(
-    (err) => {
-      throw new AppError(err.message, 422);
-    },
-  );
-  return author;
-};
-
-// 4-delete author
-
-const deleteAthor = async (id) => {
-  const author = await Author.findOneAndDelete({ _id: id }).catch((err) => {
-    throw new AppError(err.message, 422);
-  });
-  return author;
-};
-// get specific author by id
+// 5-get specific author by id
 
 const getSpecificAuther = async (authorId) => {
   const author = await Author.findById(authorId).select(
@@ -134,6 +125,38 @@ const getSpecificAuther = async (authorId) => {
   return { author, books };
 };
 
+/// /////////////////////////////////////CRUD OPERATION/////////////////////////////////////
+
+// 6-create author
+
+const create = async (data) => {
+  // eslint-disable-next-line no-param-reassign
+  const author = await Author.create(data).catch((err) => {
+    throw new AppError(err.message, 400);
+  });
+  return author;
+};
+
+// 7-update author
+
+const update = async (id, data) => {
+  const author = await Author.findOneAndUpdate({ _id: id }, data).catch(
+    (err) => {
+      throw new AppError(err.message, 422);
+    },
+  );
+  return author;
+};
+
+// 8-delete author
+
+const deleteAthor = async (id) => {
+  const author = await Author.findOneAndDelete({ _id: id }).catch((err) => {
+    throw new AppError(err.message, 422);
+  });
+  return author;
+};
+
 module.exports = {
   getAuthors,
   create,
@@ -143,5 +166,4 @@ module.exports = {
   getSpecificAuther,
   getAuthorById,
   getAuthorsPagination,
-  getAuthorIdByNumId,
 };
