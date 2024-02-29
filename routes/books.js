@@ -54,7 +54,6 @@ router.get('/popular', async (req, res, next) => {
 // for user can get books filter by shelve and pagination
 // isAuth, allowedTo("user"),
 router.get('/shelve', async (req, res, next) => {
-  console.log('here');
   const id2 = '65df2c0db4b8dfb11ffb25ab';
   const [err, books] = await asyncWrapper(
     // BookController.getBooksFilterByShelve(req.user._id, req.query)
@@ -151,6 +150,7 @@ router.patch(
     return res.json(responseData);
   },
 );
+
 router.patch(
   '/:id/rating', // Path without the base URL ?rate=5
   isAuth,
@@ -181,6 +181,7 @@ router.patch(
     return res.json(responseData);
   },
 );
+
 // isAuth,allowedTo("admin", "user"),
 router.patch(
   '/:id/shelve', // shelve?shelve=(read/ want to read /reading)
@@ -203,6 +204,7 @@ router.patch(
     return res.json('updated successfully');
   },
 );
+
 router.delete(
   '/:id',
   /* isAuth, allowedTo("admin"), */ async (req, res, next) => {
@@ -222,6 +224,7 @@ router.delete(
     return res.json(responseData);
   },
 );
+
 // get reviews for book
 router.get('/:id/reviews', async (req, res, next) => {
   const [err, reviews] = await asyncWrapper(ReviewController.getBookReviews(req.params.id));
@@ -232,10 +235,10 @@ router.get('/:id/reviews', async (req, res, next) => {
     return next(new AppError('not find', 422));
   }
   const responseData = {
-    ...reviews,
+    reviews: reviews.map((review) => review.toObject()),
     message: 'Found successfully',
   };
-  return res.json(reviews);
+  return res.json(responseData);
 });
 
 module.exports = router;

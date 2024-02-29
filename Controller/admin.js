@@ -4,6 +4,7 @@ const { hashFunction, compareFunction } = require('../lib/hashAndCompare');
 const Users = require('../models/user');
 const Category = require('../models/category');
 
+// add admin
 const addAdmin = async (userData) => {
   const {
     firstName, lastName, email, password, repassword, username, role,

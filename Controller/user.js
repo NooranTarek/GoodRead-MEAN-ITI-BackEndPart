@@ -43,6 +43,7 @@ const login = async (userData) => {
     }
   }
 };
+// user make rating
 const updateRating = async (userId, bookId, newRating) => {
   try {
     const user = await Users.findById(userId);
@@ -63,6 +64,8 @@ const updateRating = async (userId, bookId, newRating) => {
   }
 };
 
+// user add book to his list
+
 const updateShelve = async (userId, bookId, newShelf) => {
   try {
     const user = await Users.findById(userId);
@@ -82,6 +85,7 @@ const updateShelve = async (userId, bookId, newShelf) => {
     return { success: false, message: 'Error updating shelf', error };
   }
 };
+
 module.exports = {
   register, login, updateRating, updateShelve,
 };
