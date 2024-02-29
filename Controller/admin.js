@@ -32,7 +32,7 @@ const login = async (userData) => {
     if (!match) {
       throw new AppError("Passwords don't match .. try to fill them again", 400);
     } else {
-      const token = JWT.sign({ userExist }, process.env.JWT_KEY);
+      const token = JWT.sign({ userExist }, 'readBooks');
       return token;
     }
   }

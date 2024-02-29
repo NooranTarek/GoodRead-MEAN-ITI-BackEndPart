@@ -1,7 +1,8 @@
 /* eslint-disable no-underscore-dangle */
-const Book = require('../models/book');
-const Review = require('../models/review');
-const AppError = require('../lib/appError');
+const Book = require("../models/book");
+const User = require("../models/user");
+const Review = require("../models/review");
+const AppError = require("../lib/appError");
 
 const { paginationNum } = process.env;
 
@@ -9,36 +10,38 @@ const { paginationNum } = process.env;
 
 const getBooks = async () => {
   const books = await Book.find()
-    .populate('category')
-    .populate('author')
-    .populate('reviews')
+    .populate("category")
+    .populate("author")
+    .populate("reviews")
     .catch((err) => {
       throw new AppError(err.message, 422);
     });
   return books;
 };
+// 2-get books for pagination
 const getBooksForPagination = async (query) => {
   // /book?pageNum=1
   // get books pagination
   const books = await Book.find()
     .limit(paginationNum)
     .skip((query.pageNum - 1) * paginationNum)
-    .populate('category')
-    .populate('author')
-    .populate('reviews')
+    .populate("category")
+    .populate("author")
+    .populate("reviews")
     .catch((err) => {
       throw new AppError(err.message, 422);
     });
   return books;
 };
-// get popular book
+
+// 3- get popular book
 const getPopularBooks = async () => {
   const books = await Book.find()
     .sort({ countOfRating: -1 })
     .limit(paginationNum)
-    .populate('category')
-    .populate('author')
-    .populate('reviews')
+    .populate("category")
+    .populate("author")
+    .populate("reviews")
     .catch((err) => {
       throw new AppError(err.message, 422);
     });
@@ -46,57 +49,57 @@ const getPopularBooks = async () => {
 };
 
 // eslint-disable-next-line max-len
-// get specific book filter by shelve value sended in query params book/shelve?pageNum=1&shelve=want%20to%20read
-const getBooksFilterByShelve = async function (query) {
-  const pageNum = query.pageNum || 1;
-  const shelve = query.shelve || '';
-  const pagination = Number(paginationNum) || 100;
-  const books = await Book.aggregate([
-    { $match: { shelve } },
-    { $limit: pagination },
-    {
-      $lookup: {
-        from: 'authors',
-        localField: 'author',
-        foreignField: '_id',
-        as: 'author',
-      },
-    },
-    { $unwind: '$author' },
-    {
-      $project: {
-        id: 1,
-        title: 1,
-        image: 1,
-        valueOfRating: 1,
-        countOfRating: 1,
-        shelve: 1,
-        author: {
-          fullName: { $concat: ['$author.firstName', ' ', '$author.lastName'] },
+// 4- get specific book filter by shelve value sended in query params book/shelve?pageNum=1&shelve=reading/read
+const getBooksFilterByShelve = async (id, query) => {
+  const { pageNum = 1, shelve } = query;
+  const perPage = process.env.paginationNum || 10;
+
+  // const user = await User.findById(id2)
+  const user = await User.findById(id)
+    .populate({
+      path: "books",
+      populate: {
+        path: "idOfBook",
+        model: "Book",
+        populate: {
+          path: "author",
+          model: "Author",
         },
       },
-    },
-    { $skip: (pageNum - 1) * paginationNum },
-  ]).catch((err) => {
-    throw new AppError(err.message, 422);
-  });
-  const count = await Book.countDocuments({ shelve });
+    })
+    .exec()
+    .catch((err) => {
+      throw new AppError(err.message, 422);
+    });
 
-  return { books, count };
+  const filteredBooks =
+    shelve === "all"
+      ? user.books
+      : user.books.filter((book) => book.shelf === shelve);
+
+  const startIndex = (pageNum - 1) * perPage;
+  const endIndex = Math.min(startIndex + perPage, filteredBooks.length);
+
+  const paginatedBooks = filteredBooks.slice(startIndex, endIndex);
+
+  return {
+    count: filteredBooks.length,
+    books: paginatedBooks,
+  };
 };
 
-// get book by id
+// 5-get book by id
 const getBookById = async (id) => {
   const book = await Book.findOne({ id })
-    .populate('author')
-    .populate('category')
+    .populate("author")
+    .populate("category")
     .catch((err) => {
       throw new AppError(err.message, 422);
     });
   return book;
 };
 
-// 2-create book
+// 6-create book
 
 const create = async (data) => {
   // eslint-disable-next-line no-param-reassign
@@ -106,7 +109,7 @@ const create = async (data) => {
   return book;
 };
 
-// 3-update book
+// 7-update book
 
 const update = async (id, data) => {
   const book = await Book.findOneAndUpdate({ id }, data).catch((err) => {
@@ -115,7 +118,7 @@ const update = async (id, data) => {
   return book;
 };
 
-// update rating
+// 8-update rating
 
 const updateRating = async (id, newRating) => {
   const book = await Book.findOneAndUpdate(
@@ -123,24 +126,26 @@ const updateRating = async (id, newRating) => {
     {
       $inc: { countOfRating: 1, totalRating: newRating },
     },
-    { new: true },
+    { new: true }
   ).catch((err) => {
     throw new AppError(err.message, 422);
   });
   if (!book) {
-    throw new AppError('Book not found', 404);
+    throw new AppError("Book not found", 404);
   }
 
   return book;
 };
-// 4-delete book
+
+// 9-delete book
 
 const deleteBook = async (id) => {
-  const book = await Book.findOneAndDelete({ _id: id }).catch((err) => {
+  const book = await Book.findOneAndDelete({ id }).catch((err) => {
     throw new AppError(err.message, 422);
   });
   return book;
 };
+
 module.exports = {
   getBooks,
   create,
