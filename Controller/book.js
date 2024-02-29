@@ -106,6 +106,7 @@ const create = async (data) => {
   const book = await Book.create(data).catch((err) => {
     throw new AppError(err.message, 422);
   });
+
   return book;
 };
 

@@ -84,23 +84,6 @@ router.get('/:id', async (req, res, next) => {
 
 // CRUD operation in book allow for adimn only
 
-//  isAuth,allowedTo("admin")
-router.post('/', async (req, res, next) => {
-  // req.body.image = 'https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
-  const [err, data] = await asyncWrapper(BookController.create(req.body));
-  if (err) {
-    return next(err);
-  }
-  if (!data) {
-    return next(new AppError('not created', 422));
-  }
-  const responseData = {
-    ...data.toObject(),
-    message: 'Created successfully',
-  };
-  return res.json(responseData);
-});
-
 // create review for specifc book maked by specific user isAuth, allowedTo("user")
 router.post('/:id/review', async (req, res, next) => {
   const id2 = '65df2c76b4b8dfb11ffb25b1';
@@ -117,11 +100,17 @@ router.post('/:id/review', async (req, res, next) => {
   };
   return res.json(responseData);
 });
+
 // ================ With Image ==================\\
 router.post('/', upload.single('image'), async (req, res, next) => {
-  const imageOriginalName = req.file.originalname;
-  req.body.image = imageOriginalName;
-  const [err, data] = await asyncWrapper(BookController.create(req.body));
+  const image = req.file.originalname;
+  const {
+    title, category, author, description,
+  } = req.body;
+  const extractedData = {
+    title, category, author, description, image,
+  };
+  const [err, data] = await asyncWrapper(BookController.create(extractedData));
 
   if (err) {
     return next(err);
