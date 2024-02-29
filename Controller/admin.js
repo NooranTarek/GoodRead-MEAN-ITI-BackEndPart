@@ -3,7 +3,7 @@ const AppError = require('../lib/appError');
 const { hashFunction, compareFunction } = require('../lib/hashAndCompare');
 const Users = require('../models/user');
 
-// add admin
+// add admin page add amin
 const addAdmin = async (userData) => {
   const {
     firstName, lastName, email, password, username, image,

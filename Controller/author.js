@@ -8,7 +8,7 @@ const { ObjectId } = require('mongoose').Types;
 dotenv.config();
 const { paginationNum } = process.env || 100;
 
-// 1-get all authors for admin page
+// 1-get all authors for admin page sss
 
 const getAuthors = async () => {
   // author?pageNum=1,popular=(true or false)
@@ -41,11 +41,35 @@ const getPopularAuthors = async () => {
         totalBooks: { $sum: 1 },
       },
     },
-    { $sort: { totalBooks: -1 } },
-    { $limit: 6 },
+    {
+      $sort: { totalBooks: -1 },
+    },
+    {
+      $lookup: {
+        from: 'authors',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'authorDetails',
+      },
+    },
+    {
+      $unwind: '$authorDetails',
+    },
+    {
+      $project: {
+        _id: '$authorDetails._id',
+        firstName: '$authorDetails.firstName',
+        lastName: '$authorDetails.lastName',
+        image: '$authorDetails.image',
+      },
+    },
+    {
+      $limit: 6,
+    },
   ]).catch((err) => {
     throw new AppError(err.message, 400);
   });
+
   return authors;
 };
 
