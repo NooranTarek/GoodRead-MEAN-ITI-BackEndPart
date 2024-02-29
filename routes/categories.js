@@ -7,7 +7,7 @@ const { isAuth } = require('../Middleware/authentication');
 const allowedTo = require('../Middleware/authorization');
 
 // isAuth, allowedTo("admin"),
-router.post('/', async (req, res, next) => {
+router.post('/', isAuth, allowedTo("admin"), async(req, res, next) => {
   const [err, data] = await asyncWrapper(
     CategoryController.addCategory(req.body),
   );
@@ -20,7 +20,7 @@ router.post('/', async (req, res, next) => {
 });
 
 // isAuth, allowedTo("admin"),
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', isAuth, allowedTo('admin'), async (req, res, next) => {
   // eslint-disable-next-line max-len
   const [err, data] = await asyncWrapper(
     CategoryController.updateCategory(req.body, req.params.id),
@@ -29,15 +29,12 @@ router.patch('/:id', async (req, res, next) => {
     res.json({ message: 'Category updated successfully', data });
     return;
   }
-  if (err.message.startsWith('Category name')) {
-    return next(new AppError(err.message, 400));
-  }
   // eslint-disable-next-line consistent-return
   return next(new AppError(err.message, 400));
 });
 
 //  isAuth, allowedTo("admin"),
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', isAuth, allowedTo("admin"), async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     CategoryController.deleteCategory(req.params.id),
   );

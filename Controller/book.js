@@ -54,7 +54,19 @@ const getBooksFilterByShelve = async (id, query) => {
   const { pageNum = 1, shelve } = query;
   const perPage = process.env.paginationNum || 10;
 
+  // const user = await User.findById(id2)
   const user = await User.findById(id)
+    .populate({
+      path: "books",
+      populate: {
+        path: "idOfBook",
+        model: "Book",
+        populate: {
+          path: "author",
+          model: "Author",
+        },
+      },
+    })
     .exec()
     .catch((err) => {
       throw new AppError(err.message, 422);
@@ -128,7 +140,7 @@ const updateRating = async (id, newRating) => {
 // 9-delete book
 
 const deleteBook = async (id) => {
-  const book = await Book.findOneAndDelete({ _id: id }).catch((err) => {
+  const book = await Book.findOneAndDelete({ id }).catch((err) => {
     throw new AppError(err.message, 422);
   });
   return book;
