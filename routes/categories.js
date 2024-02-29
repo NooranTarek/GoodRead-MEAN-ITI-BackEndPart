@@ -62,7 +62,7 @@ router.get('/', async (req, res, next) => {
   res.json({ categories });
 });
 
-router.get('/categoriesName', async (req, res, next) => {
+router.get('/categoriesName',isAuth, allowedTo("user"), async (req, res, next) => {
   const [err, categories] = await asyncWrapper(
     CategoryController.categoriesName(),
   );
@@ -70,7 +70,7 @@ router.get('/categoriesName', async (req, res, next) => {
   res.json({ categories });
 });
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id',isAuth, allowedTo("user"), async (req, res, next) => {
   const categoryId = req.params.id;
   const page = req.query.page || 1;
   const pageSize = req.query.pageSize || 5;
