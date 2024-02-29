@@ -8,7 +8,7 @@ const { ObjectId } = require('mongoose').Types;
 dotenv.config();
 const { paginationNum } = process.env || 100;
 
-// 1-get all authors for admin page
+// 1-get all authors for admin page sss
 
 const getAuthors = async () => {
   // author?pageNum=1,popular=(true or false)
