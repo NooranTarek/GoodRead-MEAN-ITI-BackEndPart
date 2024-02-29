@@ -51,10 +51,13 @@ router.get("/popular", async (req, res, next) => {
 });
 
 // for user can get books filter by shelve and pagination
-router.get("/shelve", isAuth, allowedTo("user"), async (req, res, next) => {
+// isAuth, allowedTo("user"),
+router.get("/shelve", async (req, res, next) => {
   console.log("here");
+  const id2 = "65df2c0db4b8dfb11ffb25ab";
   const [err, books] = await asyncWrapper(
-    BookController.getBooksFilterByShelve(req.user._id, req.query)
+    // BookController.getBooksFilterByShelve(req.user._id, req.query)
+    BookController.getBooksFilterByShelve(id2, req.query)
   );
   if (!err) {
     return res.json(books);
@@ -170,19 +173,15 @@ router.patch(
     return res.json(responseData);
   }
 );
+// isAuth,allowedTo("admin", "user"),
 router.patch(
   "/:id/shelve", // shelve?shelve=(read/ want to read /reading)
-  isAuth,
-  allowedTo("admin", "user"),
+
   // add rating in user also in list of books
   async (req, res, next) => {
     // const [err, data] =
-
-    await UserController.updateShelve(
-      req.user._id,
-      req.params.id,
-      req.query.shelve
-    );
+    const id2 = "65df2c0db4b8dfb11ffb25ab";
+    await UserController.updateShelve(id2, req.params.id, req.query.shelve);
     /* if (!data) {
       return next(new AppError('Book not found', 404));
     }
