@@ -83,7 +83,7 @@ router.get('/:id', async (req, res, next) => {
 // CRUD operation in book allow for adimn only
 
 // isAuth, allowedTo("admin"),
-router.post('/', upload.single('image'), async (req, res, next) => {
+router.post('/',isAuth,allowedTo('admin') ,upload.single('image'), async (req, res, next) => {
   const imageOriginalName = req.file.originalname;
   req.body.image = imageOriginalName;
   const [err, data] = await asyncWrapper(AuthorController.create(req.body));
@@ -98,7 +98,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
 });
 
 // isAuth, allowedTo('admin'),
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id',isAuth,allowedTo('admin'), async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     AuthorController.update(req.params.id, req.body),
   );
@@ -113,7 +113,7 @@ router.patch('/:id', async (req, res, next) => {
 });
 
 // isAuth, allowedTo('admin'),
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id',isAuth,allowedTo('admin'), async (req, res, next) => {
   const [err, data] = await asyncWrapper(
     AuthorController.deleteAthor(req.params.id),
   );
