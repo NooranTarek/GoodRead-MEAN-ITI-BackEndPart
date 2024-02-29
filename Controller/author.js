@@ -77,7 +77,7 @@ const getPopularAuthors = async () => {
 
 const getAuthorById = async (id) => {
   const authorId = new ObjectId(id);
-  const books = await Book.aggregate([
+  const authorDetails = await Book.aggregate([
     { $match: { author: authorId } },
     {
       $lookup: {
@@ -107,10 +107,20 @@ const getAuthorById = async (id) => {
   ]).catch((err) => {
     throw new AppError(err.message, 422);
   });
+  // eslint-disable-next-line no-use-before-define
+  const authorBooks = await getAuthorBooks(id);
+  return { authorDetails, authorBooks };
+};
+
+const getAuthorBooks = async (id) => {
+  const authorId = new ObjectId(id);
+  const books = await Book.find({ author: authorId })
+    .catch((err) => {
+      throw new AppError(err.message, 422);
+    });
 
   return books;
 };
-
 // 5-get specific author by id
 
 const getSpecificAuther = async (authorId) => {
@@ -166,4 +176,5 @@ module.exports = {
   getSpecificAuther,
   getAuthorById,
   getAuthorsPagination,
+  getAuthorBooks,
 };
