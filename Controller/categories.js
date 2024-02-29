@@ -107,7 +107,6 @@ const booksForSpecificCategory = async (categoryId, page, pageSize) => {
   return { categoryName: category.name, booksCount, paginatedBooks };
 };
 
-
 const getCategoryByObjId = async (_id) => {
   const category = await Category.findById(_id).catch((err) => {
     throw new AppError(err.message, 500);
