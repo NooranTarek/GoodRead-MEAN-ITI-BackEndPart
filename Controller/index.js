@@ -5,4 +5,5 @@ module.exports = {
   UserController: require('./user'),
   AdminController: require('./admin'),
   CategoryController: require('./categories'),
+  ReviewController: require('./review'),
 };

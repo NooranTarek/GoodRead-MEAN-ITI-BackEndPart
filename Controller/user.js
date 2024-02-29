@@ -6,7 +6,7 @@ const Users = require('../models/user');
 // module.exports = { register };
 const register = async (userData) => {
   const {
-    firstName, lastName, email, password,
+    firstName, lastName, email, password, image,
   } = userData;
   const hashedPassword = await hashFunction({ plainText: password });
   const newUser = await Users.create({
@@ -14,6 +14,7 @@ const register = async (userData) => {
     lastName,
     email,
     password: hashedPassword,
+    image,
   }).catch((err) => {
     throw new AppError(err.message, 400);
   });
