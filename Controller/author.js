@@ -43,9 +43,18 @@ const getPopularAuthors = async () => {
     },
     { $sort: { totalBooks: -1 } },
     { $limit: 6 },
+    {
+      $lookup: {
+        from: 'authors',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'authorDetails',
+      },
+    },
   ]).catch((err) => {
     throw new AppError(err.message, 400);
   });
+
   return authors;
 };
 
