@@ -126,6 +126,7 @@ router.patch(
     const [err, data] = await asyncWrapper(
       BookController.update(req.params.id, req.body)
     );
+
     if (!data) {
       return next(new AppError("Book not found", 404));
     }
