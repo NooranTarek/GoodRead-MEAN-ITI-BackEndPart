@@ -2,6 +2,8 @@ const JWT = require('jsonwebtoken');
 const AppError = require('../lib/appError');
 const { hashFunction, compareFunction } = require('../lib/hashAndCompare');
 const Users = require('../models/user');
+const { sendEmail } = require('../emailing/user.email');
+const { emailHtml } = require('../emailing/email.html');
 
 // module.exports = { register };
 const register = async (userData) => {
@@ -18,9 +20,9 @@ const register = async (userData) => {
   }).catch((err) => {
     throw new AppError(err.message, 400);
   });
+  sendEmail({ email, html: emailHtml(newUser.username) });
   return newUser;
 };
-
 // login user
 const login = async (userData) => {
   const { username, password } = userData;
