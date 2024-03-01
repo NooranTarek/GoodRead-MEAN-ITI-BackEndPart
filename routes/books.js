@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const router = require('express').Router();
 // eslint-disable-next-line import/no-extraneous-dependencies
 const multer = require('multer');
@@ -53,11 +52,10 @@ router.get('/popular', async (req, res, next) => {
 
 // for user can get books filter by shelve and pagination
 // isAuth, allowedTo("user"),
-router.get('/shelve',isAuth, allowedTo("user"), async (req, res, next) => {
-  const id2 = '65df2c0db4b8dfb11ffb25ab';
+router.get('/shelve', isAuth, allowedTo('user'), async (req, res, next) => {
   const [err, books] = await asyncWrapper(
     // BookController.getBooksFilterByShelve(req.user._id, req.query)
-    BookController.getBooksFilterByShelve(id2, req.query),
+    BookController.getBooksFilterByShelve(req.user._id, req.query),
   );
   if (!err) {
     return res.json(books);
@@ -66,7 +64,7 @@ router.get('/shelve',isAuth, allowedTo("user"), async (req, res, next) => {
 });
 
 // get specific book by id isAuth, allowedTo("user")
-router.get('/:id',isAuth, allowedTo("user"), async (req, res, next) => {
+router.get('/:id', isAuth, allowedTo('user'), async (req, res, next) => {
   const [err, book] = await asyncWrapper(
     BookController.getBookById(req.params.id),
   );
@@ -84,9 +82,8 @@ router.get('/:id',isAuth, allowedTo("user"), async (req, res, next) => {
 // CRUD operation in book allow for adimn only
 
 // create review for specifc book maked by specific user isAuth, allowedTo("user")
-router.post('/:id/review',isAuth, allowedTo("user"), async (req, res, next) => {
-  const id2 = '65df2c76b4b8dfb11ffb25b1';
-  const [err, data] = await asyncWrapper(BookController.createReview(id2, req.body, req.params.id));
+router.post('/:id/review', isAuth, allowedTo('user'), async (req, res, next) => {
+  const [err, data] = await asyncWrapper(BookController.createReview(req.user._id, req.body, req.params.id));
   if (err) {
     return next(err);
   }
@@ -101,7 +98,7 @@ router.post('/:id/review',isAuth, allowedTo("user"), async (req, res, next) => {
 });
 
 // ================ With Image ==================\\
-router.post('/',isAuth, allowedTo("admin"), upload.single('image'), async (req, res, next) => {
+router.post('/', isAuth, allowedTo('admin'), upload.single('image'), async (req, res, next) => {
   const image = req.file.originalname;
   const {
     title, category, author, description,
@@ -126,8 +123,8 @@ router.post('/',isAuth, allowedTo("admin"), upload.single('image'), async (req, 
 
 router.patch(
   '/:id',
- isAuth,
-   allowedTo("admin"),
+  isAuth,
+  allowedTo('admin'),
 
   async (req, res, next) => {
     const [err, data] = await asyncWrapper(
@@ -185,12 +182,13 @@ router.patch(
 // isAuth,allowedTo("admin", "user"),
 router.patch(
   '/:id/shelve', // shelve?shelve=(read/ want to read /reading)
-  isAuth,allowedTo("admin", "user"),
+  isAuth,
+  allowedTo('admin', 'user'),
   // add rating in user also in list of books
   async (req, res, next) => {
     // const [err, data] =
-    const id2 = '65df2c0db4b8dfb11ffb25ab';
-    await UserController.updateShelve(id2, req.params.id, req.query.shelve);
+    // const id2 = '65df2c0db4b8dfb11ffb25ab';
+    await UserController.updateShelve(req.user._id, req.params.id, req.query.shelve);
     /* if (!data) {
       return next(new AppError('Book not found', 404));
     }
@@ -207,7 +205,9 @@ router.patch(
 
 router.delete(
   '/:id',
-   isAuth, allowedTo("admin"),  async (req, res, next) => {
+  isAuth,
+  allowedTo('admin'),
+  async (req, res, next) => {
     const [err, data] = await asyncWrapper(
       BookController.deleteBook(req.params.id),
     );
@@ -226,7 +226,7 @@ router.delete(
 );
 
 // get reviews for book
-router.get('/:id/reviews',isAuth,allowedTo("user"), async (req, res, next) => {
+router.get('/:id/reviews', isAuth, allowedTo('user'), async (req, res, next) => {
   const [err, reviews] = await asyncWrapper(ReviewController.getBookReviews(req.params.id));
   if (err) {
     return next(err);
@@ -241,4 +241,4 @@ router.get('/:id/reviews',isAuth,allowedTo("user"), async (req, res, next) => {
   return res.json(responseData);
 });
 
-module.exports = router;
+module.exports = router;
