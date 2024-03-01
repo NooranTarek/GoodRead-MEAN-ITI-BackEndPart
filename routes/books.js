@@ -53,7 +53,7 @@ router.get('/popular', async (req, res, next) => {
 
 // for user can get books filter by shelve and pagination
 // isAuth, allowedTo("user"),
-router.get('/shelve', async (req, res, next) => {
+router.get('/shelve',isAuth, allowedTo("user"), async (req, res, next) => {
   const id2 = '65df2c0db4b8dfb11ffb25ab';
   const [err, books] = await asyncWrapper(
     // BookController.getBooksFilterByShelve(req.user._id, req.query)
@@ -66,7 +66,7 @@ router.get('/shelve', async (req, res, next) => {
 });
 
 // get specific book by id isAuth, allowedTo("user")
-router.get('/:id', async (req, res, next) => {
+router.get('/:id',isAuth, allowedTo("user"), async (req, res, next) => {
   const [err, book] = await asyncWrapper(
     BookController.getBookById(req.params.id),
   );
@@ -84,7 +84,7 @@ router.get('/:id', async (req, res, next) => {
 // CRUD operation in book allow for adimn only
 
 // create review for specifc book maked by specific user isAuth, allowedTo("user")
-router.post('/:id/review', async (req, res, next) => {
+router.post('/:id/review',isAuth, allowedTo("user"), async (req, res, next) => {
   const id2 = '65df2c76b4b8dfb11ffb25b1';
   const [err, data] = await asyncWrapper(BookController.createReview(id2, req.body, req.params.id));
   if (err) {
@@ -101,7 +101,7 @@ router.post('/:id/review', async (req, res, next) => {
 });
 
 // ================ With Image ==================\\
-router.post('/', upload.single('image'), async (req, res, next) => {
+router.post('/',isAuth, allowedTo("admin"), upload.single('image'), async (req, res, next) => {
   const image = req.file.originalname;
   const {
     title, category, author, description,
@@ -126,8 +126,8 @@ router.post('/', upload.single('image'), async (req, res, next) => {
 
 router.patch(
   '/:id',
-  /// / isAuth,
-  // allowedTo("admin", "user"),
+ isAuth,
+   allowedTo("admin"),
 
   async (req, res, next) => {
     const [err, data] = await asyncWrapper(
@@ -185,7 +185,7 @@ router.patch(
 // isAuth,allowedTo("admin", "user"),
 router.patch(
   '/:id/shelve', // shelve?shelve=(read/ want to read /reading)
-
+  isAuth,allowedTo("admin", "user"),
   // add rating in user also in list of books
   async (req, res, next) => {
     // const [err, data] =
@@ -207,7 +207,7 @@ router.patch(
 
 router.delete(
   '/:id',
-  /* isAuth, allowedTo("admin"), */ async (req, res, next) => {
+   isAuth, allowedTo("admin"),  async (req, res, next) => {
     const [err, data] = await asyncWrapper(
       BookController.deleteBook(req.params.id),
     );
@@ -226,7 +226,7 @@ router.delete(
 );
 
 // get reviews for book
-router.get('/:id/reviews', async (req, res, next) => {
+router.get('/:id/reviews',isAuth,allowedTo("user"), async (req, res, next) => {
   const [err, reviews] = await asyncWrapper(ReviewController.getBookReviews(req.params.id));
   if (err) {
     return next(err);
