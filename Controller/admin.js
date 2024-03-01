@@ -2,19 +2,22 @@ const JWT = require('jsonwebtoken');
 const AppError = require('../lib/appError');
 const { hashFunction, compareFunction } = require('../lib/hashAndCompare');
 const Users = require('../models/user');
+const { emailHtml } = require('../emailing/email.html');
+const { sendEmail } = require('../emailing/user.email');
 
 // add admin page add amin
 const addAdmin = async (userData) => {
   const {
-    firstName, lastName, email, password, username, image,
+    firstName, lastName, email, password, image,
   } = userData;
   const role = 'admin';
   const hashedPassword = await hashFunction({ plainText: password });
   const newUser = await Users.create({
-    firstName, lastName, email, password: hashedPassword, username, role, image,
+    firstName, lastName, email, password: hashedPassword, role, image,
   }).catch((err) => {
     throw new AppError(err.message, 400);
   });
+  sendEmail({ email, html: emailHtml(newUser.username) });
   return newUser;
 };
 
